@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Habit Coach</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#0f172a;
+  color:#e5e7eb;
+  padding:20px;
+}
+textarea{
+  width:100%;
+  height:220px;
+  background:#020617;
+  color:#e5e7eb;
+  border:1px solid #334155;
+  padding:12px;
+  font-size:14px;
+}
+button{
+  background:#22c55e;
+  border:none;
+  padding:12px 20px;
+  font-size:16px;
+  margin-top:12px;
+  cursor:pointer;
+}
+.card{
+  background:#020617;
+  padding:15px;
+  margin-top:16px;
+  border-left:4px solid #22c55e;
+}
+h1,h2{color:#22c55e}
+ul{margin-left:20px}
+</style>
+</head>
+
+<body>
+
+<h1>🧠 AI Habit Coach & Data Analyst</h1>
+<p>Paste habit data (1 = completed, 0 = missed)</p>
+
+<textarea id="input">
+Workout: 1,1,0,1,1,0,1
+Reading: 0,1,1,1,0,1,1
+Meditation: 1,0,0,1,1,0,1
+</textarea>
+
+<button onclick="analyze()">Analyze My Habits</button>
+
+<div id="output"></div>
+
+<script>
+function analyze(){
+  const text=document.getElementById("input").value.trim();
+  const lines=text.split("\n");
+
+  let totalScore=0;
+  let habitCount=0;
+  let html="";
+
+  lines.forEach(line=>{
+    let parts=line.split(":");
+    if(parts.length<2) return;
+
+    let name=parts[0].trim();
+    let values=parts[1].split(/[, ]+/).map(Number).filter(v=>v===0||v===1);
+
+    if(values.length===0) return;
+
+    let rate=values.reduce((a,b)=>a+b,0)/values.length;
+    totalScore+=rate;
+    habitCount++;
+
+    let status =
+      rate>=0.75 ? "Strong ✅" :
+      rate>=0.5  ? "Inconsistent ⚠️" :
+                   "Weak ❌";
+
+    let advice =
+      rate<0.5  ? "Simplify this habit and attach it to an existing routine." :
+      rate<0.75 ? "Reduce difficulty and focus on consistency." :
+                  "This habit is solid. Protect it.";
+
+    html+=`
+    <div class="card">
+      <h2>${name}</h2>
+      <p><b>Status:</b> ${status}</p>
+      <p><b>Completion:</b> ${(rate*100).toFixed(1)}%</p>
+      <p>${advice}</p>
+    </div>`;
+  });
+
+  let discipline=Math.round((totalScore/habitCount)*100);
+
+  let prediction =
+    discipline>=80 ? "Performance likely to improve next month 📈" :
+    discipline>=60 ? "Performance will stay stable if optimized ⚖️" :
+                     "Risk of decline without changes 📉";
+
+  document.getElementById("output").innerHTML = `
+    <div class="card">
+      <h2>📊 Habit Analysis Summary</h2>
+      <p><b>Discipline Score:</b> ${discipline}/100</p>
+    </div>
+
+    <div class="card">
+      <h2>📈 Trend Insights</h2>
+      <p>Consistency matters more than intensity.</p>
+    </div>
+
+    <div class="card">
+      <h2>🔮 Predictions</h2>
+      <p>${prediction}</p>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Weekly Focus Plan</h2>
+      <ul>
+        <li>Focus on the weakest habit only</li>
+        <li>Reduce difficulty by 50%</li>
+        <li>Habit-stack with an existing routine</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>🔥 Motivation Message</h2>
+      <p>Discipline beats motivation. Small wins compound.</p>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
