@@ -25,7 +25,6 @@ body{
   font-family:system-ui;
   background:var(--bg);
   color:var(--text);
-  transition:.3s;
 }
 
 /* HEADER */
@@ -37,16 +36,9 @@ header{
   padding:0 16px;
   box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
-.menu{
-  font-size:22px;
-  cursor:pointer;
-  margin-right:12px;
-}
+.menu{font-size:22px;cursor:pointer;margin-right:12px}
 header img{height:34px}
-header h1{
-  margin-left:auto;
-  font-size:18px;
-}
+header h1{margin-left:auto;font-size:18px}
 
 /* SETTINGS SIDEBAR */
 #sidebar{
@@ -141,9 +133,7 @@ main{
   cursor:pointer;
   font-size:20px;
   font-weight:600;
-}
-.card:hover{
-  outline:3px solid var(--accent);
+  color:#fff;
 }
 
 /* MINI CALENDAR */
@@ -154,10 +144,11 @@ main{
   margin-top:12px;
 }
 .mini div{
-  background:#e5e7eb;
+  background:rgba(255,255,255,.8);
   font-size:11px;
   padding:6px 0;
   border-radius:6px;
+  color:#000;
 }
 
 /* BACK LINKS */
@@ -279,32 +270,30 @@ colorPicker.value=state.accent;
 if(state.theme==="dark")document.body.classList.add("dark");
 updateModeText();
 
-/* SETTINGS FUNCTIONS */
-function toggleSidebar(){
-  sidebar.classList.toggle("open");
-}
+function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
-  updateModeText();
-  save();
+  updateModeText();save();
 }
 function updateModeText(){
-  modeText.textContent=document.body.classList.contains("dark")
-    ?"Light Mode"
-    :"Dark Mode";
+  modeText.textContent=document.body.classList.contains("dark")?"Light Mode":"Dark Mode";
 }
-
 nameInput.oninput=e=>{
   state.name=e.target.value||"Hodded Habits";
-  title.textContent=state.name;
-  save();
+  title.textContent=state.name;save();
 };
 colorPicker.oninput=e=>{
   state.accent=e.target.value;
   document.documentElement.style.setProperty("--accent",e.target.value);
   save();
 };
+
+/* RANDOM COLOR FUNCTION */
+function randomColor(){
+  const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
+  return colors[Math.floor(Math.random()*colors.length)];
+}
 
 /* CALENDAR */
 const app=document.getElementById("app");
@@ -316,16 +305,17 @@ let chart=null;
 function showYears(){
   app.innerHTML=`
     <div class="grid years">
-      ${years.map(y=>`<div class="card" onclick="showMonths(${y})">${y}</div>`).join("")}
+      ${years.map(y=>`<div class="card" style="background:var(--accent)" onclick="showMonths(${y})">${y}</div>`).join("")}
     </div>`;
 }
+
 function showMonths(y){
   current.year=y;
   app.innerHTML=`
     <div class="back-link" onclick="showYears()">← Back to Years</div>
     <div class="grid months">
       ${months.map((m,i)=>`
-        <div class="card" onclick="showDays(${i})">
+        <div class="card" style="background:${randomColor()}" onclick="showDays(${i})">
           ${m}
           <div class="mini">
             ${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}
@@ -333,6 +323,7 @@ function showMonths(y){
         </div>`).join("")}
     </div>`;
 }
+
 function showDays(m){
   current.month=m;
   const days=new Date(current.year,m+1,0).getDate();
@@ -353,22 +344,19 @@ function openDay(d){
   panelDate.textContent=`${months[current.month]} ${d}, ${current.year}`;
   renderTasks(key);
 }
-function closePanel(){
-  panel.classList.remove("open");
-}
+function closePanel(){panel.classList.remove("open")}
+
 function addTask(){
   const key=`${current.year}-${current.month}-${current.day}`;
   if(!taskInput.value)return;
   state.data[key]=state.data[key]||[];
   state.data[key].push({t:taskInput.value,d:false});
   taskInput.value="";
-  save();
-  renderTasks(key);
+  save();renderTasks(key);
 }
 function toggleTask(key,i){
   state.data[key][i].d=!state.data[key][i].d;
-  save();
-  renderTasks(key);
+  save();renderTasks(key);
 }
 function renderTasks(key){
   const list=state.data[key]||[];
@@ -388,7 +376,10 @@ function renderTasks(key){
     type:"pie",
     data:{
       labels:["Done","Left"],
-      datasets:[{data:[done,list.length-done],backgroundColor:[state.accent,"#cbd5e1"]}]
+      datasets:[{
+        data:[done,list.length-done],
+        backgroundColor:[state.accent,"#cbd5e1"]
+      }]
     },
     options:{plugins:{legend:{position:"bottom"}}}
   });
