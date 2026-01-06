@@ -91,14 +91,13 @@ header h1{
   margin-bottom:12px;
 }
 
-/* SLIDING TOGGLE */
+/* SLIDER */
 .toggle-wrap{
   display:flex;
   justify-content:space-between;
   align-items:center;
   margin:14px 0;
 }
-
 .toggle{
   width:54px;
   height:28px;
@@ -135,65 +134,6 @@ main{padding:16px}
   margin-bottom:16px;
   box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
-
-/* CALENDAR */
-.calendar{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:6px;
-}
-.day{
-  padding:10px 0;
-  border-radius:999px;
-  background:#e5e7eb;
-  text-align:center;
-  cursor:pointer;
-}
-.day:hover{
-  background:var(--accent);
-  color:white;
-}
-
-/* DAILY PANEL */
-#daily{
-  position:fixed;
-  top:0;
-  right:-100%;
-  width:100%;
-  max-width:420px;
-  height:100%;
-  background:var(--card);
-  padding:16px;
-  transition:.3s;
-  z-index:2000;
-}
-#daily.open{right:0}
-
-.task{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:8px;
-}
-.task button{
-  background:#ef4444;
-  color:white;
-  border:none;
-  border-radius:6px;
-  padding:4px 8px;
-}
-
-/* INPUTS */
-input,button{
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-button{
-  background:var(--accent);
-  color:white;
-  border:none;
-  cursor:pointer;
-}
 </style>
 </head>
 
@@ -211,12 +151,9 @@ button{
   <h3>Settings</h3>
 
   <div class="toggle-wrap">
-    <span id="modeText">Switch to Dark Mode</span>
+    <span id="modeText">Dark Mode</span>
     <div class="toggle" onclick="toggleTheme()"></div>
   </div>
-
-  <label>Accent Color</label><br>
-  <input type="color" id="colorPicker">
 </div>
 
 <!-- HEADER -->
@@ -226,47 +163,29 @@ button{
   <h1>Hodded Habits</h1>
 </header>
 
-<!-- MAIN -->
-<main>
-  <div class="card">
-    <h2>June 2026</h2>
-    <div class="calendar" id="calendar"></div>
-  </div>
-</main>
-
-<!-- DAILY -->
-<div id="daily">
-  <h2 id="dayTitle"></h2>
-  <input id="taskInput" placeholder="New habit">
-  <button onclick="addTask()">Add</button>
-  <div id="tasks"></div>
-  <br>
-  <button onclick="closeDaily()">Close</button>
-</div>
-
 <script>
-window.onload=()=>document.getElementById("loader").style.display="none";
-
-let state=JSON.parse(localStorage.getItem("hh"))||{
-  tasks:[],
-  theme:"light",
-  accent:"#2563eb"
+window.onload = () => {
+  document.getElementById("loader").style.display = "none";
 };
 
-function save(){localStorage.setItem("hh",JSON.stringify(state))}
+let state = JSON.parse(localStorage.getItem("hh")) || {
+  theme: "light"
+};
 
-/* INITIAL THEME */
-document.documentElement.style.setProperty("--accent",state.accent);
-document.getElementById("colorPicker").value=state.accent;
+const modeText = document.getElementById("modeText");
 
-const modeText=document.getElementById("modeText");
-
-if(state.theme==="dark"){
-  document.body.classList.add("dark");
-  modeText.textContent="Switch to Light Mode";
-}else{
-  modeText.textContent="Switch to Dark Mode";
+function updateModeText(){
+  if(document.body.classList.contains("dark")){
+    modeText.textContent = "Light Mode";
+  }else{
+    modeText.textContent = "Dark Mode";
+  }
 }
+
+if(state.theme === "dark"){
+  document.body.classList.add("dark");
+}
+updateModeText();
 
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("open");
@@ -274,61 +193,9 @@ function toggleSidebar(){
 
 function toggleTheme(){
   document.body.classList.toggle("dark");
-  state.theme=document.body.classList.contains("dark")?"dark":"light";
-  modeText.textContent=state.theme==="dark"
-    ?"Switch to Light Mode"
-    :"Switch to Dark Mode";
-  save();
-}
-
-document.getElementById("colorPicker").oninput=e=>{
-  document.documentElement.style.setProperty("--accent",e.target.value);
-  state.accent=e.target.value;
-  save();
-};
-
-/* CALENDAR */
-const cal=document.getElementById("calendar");
-for(let i=1;i<=30;i++){
-  const d=document.createElement("div");
-  d.className="day";
-  d.textContent=i;
-  d.onclick=()=>openDaily(i);
-  cal.appendChild(d);
-}
-
-/* DAILY */
-function openDaily(day){
-  document.getElementById("dayTitle").textContent=`June ${day}, 2026`;
-  document.getElementById("daily").classList.add("open");
-  renderTasks();
-}
-function closeDaily(){
-  document.getElementById("daily").classList.remove("open");
-}
-
-/* TASKS */
-function addTask(){
-  const v=document.getElementById("taskInput").value;
-  if(!v)return;
-  state.tasks.push(v);
-  document.getElementById("taskInput").value="";
-  save();renderTasks();
-}
-function removeTask(i){
-  state.tasks.splice(i,1);
-  save();renderTasks();
-}
-function renderTasks(){
-  const t=document.getElementById("tasks");
-  t.innerHTML="";
-  state.tasks.forEach((task,i)=>{
-    t.innerHTML+=`
-    <div class="task">
-      ${task}
-      <button onclick="removeTask(${i})">X</button>
-    </div>`;
-  });
+  state.theme = document.body.classList.contains("dark") ? "dark" : "light";
+  updateModeText();
+  localStorage.setItem("hh", JSON.stringify(state));
 }
 </script>
 
