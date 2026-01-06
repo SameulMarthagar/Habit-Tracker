@@ -7,10 +7,10 @@
 
 <style>
 :root{
+  --accent:#2563eb;
   --bg:#f8fafc;
   --text:#0f172a;
   --card:#ffffff;
-  --accent:#2563eb;
 }
 
 body.dark{
@@ -41,7 +41,7 @@ body{
   z-index:9999;
 }
 #loader img{
-  width:120px;
+  width:110px;
   animation:spin 1.8s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -60,7 +60,7 @@ header{
   cursor:pointer;
   margin-right:12px;
 }
-header img{height:36px}
+header img{height:34px}
 header h1{
   margin-left:auto;
   font-size:18px;
@@ -81,7 +81,48 @@ header h1{
   z-index:1000;
 }
 #sidebar.open{left:0}
-#sidebar h2{font-size:16px;margin-bottom:12px}
+#sidebar h2{margin:0 0 12px;font-size:16px}
+.back-btn{
+  background:none;
+  border:none;
+  font-size:14px;
+  cursor:pointer;
+  margin-bottom:12px;
+  color:var(--accent);
+}
+
+/* TOGGLE SWITCH */
+.switch{
+  position:relative;
+  width:44px;
+  height:24px;
+}
+.switch input{display:none}
+.slider{
+  position:absolute;
+  inset:0;
+  background:#cbd5e1;
+  border-radius:999px;
+  cursor:pointer;
+  transition:.3s;
+}
+.slider:before{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:white;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:.3s;
+}
+input:checked + .slider{
+  background:var(--accent);
+}
+input:checked + .slider:before{
+  transform:translateX(20px);
+}
 
 /* MAIN */
 main{padding:16px}
@@ -106,7 +147,7 @@ main{padding:16px}
   text-align:center;
   cursor:pointer;
 }
-.day:hover{opacity:.85}
+.day:hover{background:var(--accent);color:#fff}
 
 /* DAILY PANEL */
 #daily{
@@ -126,7 +167,6 @@ main{padding:16px}
 .task{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-bottom:8px;
 }
 .task button{
@@ -156,23 +196,32 @@ button{
 
 <!-- LOADER -->
 <div id="loader">
-  <img src="logo.png" alt="Hodded Habits logo">
+  <img src="logo.png">
   <p>Hodded Habits</p>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
+  <button class="back-btn" onclick="toggleSidebar()">← Back</button>
   <h2>Settings</h2>
-  <button onclick="toggleTheme()">Light / Dark</button>
-  <br><br>
+
+  <div style="display:flex;align-items:center;gap:10px">
+    <span>Dark Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <br>
   <label>Accent Color</label><br>
-  <input type="color" onchange="setAccent(this.value)">
+  <input type="color" id="colorPicker">
 </div>
 
 <!-- HEADER -->
 <header>
   <span class="menu-btn" onclick="toggleSidebar()">☰</span>
-  <img src="logo.png" alt="logo">
+  <img src="logo.png">
   <h1>Hodded Habits</h1>
 </header>
 
@@ -184,7 +233,7 @@ button{
   </div>
 </main>
 
-<!-- DAILY PANEL -->
+<!-- DAILY -->
 <div id="daily">
   <h2 id="dayTitle"></h2>
   <input id="taskInput" placeholder="New habit">
@@ -195,42 +244,42 @@ button{
 </div>
 
 <script>
-/* HIDE LOADER SAFELY */
-window.onload = function(){
-  document.getElementById("loader").style.display="none";
+window.onload=()=>document.getElementById("loader").style.display="none";
+
+let state=JSON.parse(localStorage.getItem("hh"))||{
+  tasks:[],
+  theme:"light",
+  accent:"#2563eb"
 };
 
-/* STATE */
-let state = JSON.parse(localStorage.getItem("hh")) || {
-  tasks: [],
-  theme: "light",
-  accent: "#2563eb"
-};
+function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
-document.documentElement.style.setProperty("--accent", state.accent);
-if(state.theme==="dark") document.body.classList.add("dark");
+document.documentElement.style.setProperty("--accent",state.accent);
+document.getElementById("colorPicker").value=state.accent;
 
-function save(){
-  localStorage.setItem("hh", JSON.stringify(state));
+if(state.theme==="dark"){
+  document.body.classList.add("dark");
+  document.getElementById("themeToggle").checked=true;
 }
 
-/* SIDEBAR */
+document.getElementById("themeToggle").onchange=e=>{
+  document.body.classList.toggle("dark",e.target.checked);
+  state.theme=e.target.checked?"dark":"light";
+  save();
+};
+
+document.getElementById("colorPicker").oninput=e=>{
+  document.documentElement.style.setProperty("--accent",e.target.value);
+  state.accent=e.target.value;
+  save();
+};
+
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("open");
 }
-function toggleTheme(){
-  document.body.classList.toggle("dark");
-  state.theme = document.body.classList.contains("dark") ? "dark" : "light";
-  save();
-}
-function setAccent(color){
-  document.documentElement.style.setProperty("--accent", color);
-  state.accent = color;
-  save();
-}
 
 /* CALENDAR */
-const cal = document.getElementById("calendar");
+const cal=document.getElementById("calendar");
 for(let i=1;i<=30;i++){
   const d=document.createElement("div");
   d.className="day";
@@ -239,9 +288,9 @@ for(let i=1;i<=30;i++){
   cal.appendChild(d);
 }
 
-/* DAILY PANEL */
+/* DAILY */
 function openDaily(day){
-  document.getElementById("dayTitle").textContent = `June ${day}, 2026`;
+  document.getElementById("dayTitle").textContent=`June ${day}, 2026`;
   document.getElementById("daily").classList.add("open");
   renderTasks();
 }
@@ -251,27 +300,25 @@ function closeDaily(){
 
 /* TASKS */
 function addTask(){
-  const input=document.getElementById("taskInput");
-  if(!input.value) return;
-  state.tasks.push(input.value);
-  input.value="";
-  save();
-  renderTasks();
+  const v=document.getElementById("taskInput").value;
+  if(!v)return;
+  state.tasks.push(v);
+  document.getElementById("taskInput").value="";
+  save();renderTasks();
 }
 function removeTask(i){
   state.tasks.splice(i,1);
-  save();
-  renderTasks();
+  save();renderTasks();
 }
 function renderTasks(){
   const t=document.getElementById("tasks");
   t.innerHTML="";
   state.tasks.forEach((task,i)=>{
     t.innerHTML+=`
-      <div class="task">
-        ${task}
-        <button onclick="removeTask(${i})">X</button>
-      </div>`;
+    <div class="task">
+      ${task}
+      <button onclick="removeTask(${i})">X</button>
+    </div>`;
   });
 }
 </script>
