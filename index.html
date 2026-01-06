@@ -19,13 +19,13 @@ body.dark{
   --card:#020617;
   --text:#e5e7eb;
 }
-
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:system-ui;
   background:var(--bg);
   color:var(--text);
+  transition:.3s;
 }
 
 /* HEADER */
@@ -37,9 +37,83 @@ header{
   padding:0 16px;
   box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
-.menu{font-size:22px;cursor:pointer;margin-right:12px}
+.menu{
+  font-size:22px;
+  cursor:pointer;
+  margin-right:12px;
+}
 header img{height:34px}
-header h1{margin-left:auto;font-size:18px}
+header h1{
+  margin-left:auto;
+  font-size:18px;
+}
+
+/* SETTINGS SIDEBAR */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-300px;
+  width:300px;
+  height:100%;
+  background:var(--card);
+  padding:16px;
+  transition:.3s;
+  box-shadow:2px 0 14px rgba(0,0,0,.2);
+  z-index:3000;
+}
+#sidebar.open{left:0}
+
+.back{
+  cursor:pointer;
+  color:var(--accent);
+  margin-bottom:14px;
+}
+
+/* TOGGLE */
+.toggle-wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:14px 0;
+}
+.toggle{
+  width:52px;
+  height:26px;
+  background:#cbd5e1;
+  border-radius:999px;
+  position:relative;
+  cursor:pointer;
+}
+.toggle::after{
+  content:"";
+  width:20px;
+  height:20px;
+  background:white;
+  border-radius:50%;
+  position:absolute;
+  top:3px;
+  left:3px;
+  transition:.3s;
+}
+body.dark .toggle{
+  background:var(--accent);
+}
+body.dark .toggle::after{
+  transform:translateX(26px);
+}
+
+label{
+  font-size:13px;
+  display:block;
+  margin-top:12px;
+}
+input{
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-top:6px;
+}
 
 /* MAIN */
 main{
@@ -58,7 +132,6 @@ main{
 .months{grid-template-columns:repeat(4,1fr)}
 .days{grid-template-columns:repeat(7,1fr)}
 
-/* CARDS */
 .card{
   background:var(--card);
   border-radius:18px;
@@ -87,15 +160,15 @@ main{
   border-radius:6px;
 }
 
-/* BACK */
-.back{
+/* BACK LINKS */
+.back-link{
   font-size:16px;
   color:var(--accent);
   cursor:pointer;
   margin-bottom:20px;
 }
 
-/* MONTH VIEW */
+/* MONTH */
 .month-header{
   text-align:center;
   font-size:26px;
@@ -118,8 +191,10 @@ main{
 /* DAY PANEL */
 #panel{
   position:fixed;
-  top:0;right:-420px;
-  width:420px;height:100%;
+  top:0;
+  right:-420px;
+  width:420px;
+  height:100%;
   background:var(--card);
   padding:18px;
   transition:.3s;
@@ -127,17 +202,48 @@ main{
 }
 #panel.open{right:0}
 
-.task{display:flex;gap:8px;margin-bottom:6px}
-.progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-bottom:12px}
-.progress div{height:100%;background:var(--accent)}
+.task{
+  display:flex;
+  gap:8px;
+  margin-bottom:6px;
+}
+.progress{
+  height:10px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+.progress div{
+  height:100%;
+  background:var(--accent);
+}
 </style>
 </head>
 
 <body>
 
+<!-- SETTINGS -->
+<div id="sidebar">
+  <div class="back" onclick="toggleSidebar()">← Back</div>
+  <h3>Settings</h3>
+
+  <label>Name</label>
+  <input id="nameInput">
+
+  <div class="toggle-wrap">
+    <span id="modeText">Dark Mode</span>
+    <div class="toggle" onclick="toggleTheme()"></div>
+  </div>
+
+  <label>Theme Color</label>
+  <input type="color" id="colorPicker">
+</div>
+
 <header>
-  <span class="menu">☰</span>
-  <h1>Hodded Habits</h1>
+  <span class="menu" onclick="toggleSidebar()">☰</span>
+  <img src="logo.png">
+  <h1 id="title">Hodded Habits</h1>
 </header>
 
 <main>
@@ -146,25 +252,67 @@ main{
 
 <!-- DAY PANEL -->
 <div id="panel">
-  <div class="back" onclick="closePanel()">← Back to Month</div>
+  <div class="back-link" onclick="closePanel()">← Back to Month</div>
   <h3 id="panelDate"></h3>
   <div class="progress"><div id="bar"></div></div>
-  <input id="taskInput" placeholder="Add task" style="width:100%;padding:8px">
+  <input id="taskInput" placeholder="Add task">
   <button onclick="addTask()" style="width:100%;margin:10px 0">Add</button>
   <div id="tasks"></div>
   <canvas id="pie"></canvas>
 </div>
 
 <script>
+/* STATE */
+let state=JSON.parse(localStorage.getItem("hh"))||{
+  name:"Hodded Habits",
+  theme:"light",
+  accent:"#2563eb",
+  data:{}
+};
+function save(){localStorage.setItem("hh",JSON.stringify(state))}
+
+/* APPLY SETTINGS */
+title.textContent=state.name;
+nameInput.value=state.name;
+document.documentElement.style.setProperty("--accent",state.accent);
+colorPicker.value=state.accent;
+if(state.theme==="dark")document.body.classList.add("dark");
+updateModeText();
+
+/* SETTINGS FUNCTIONS */
+function toggleSidebar(){
+  sidebar.classList.toggle("open");
+}
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  state.theme=document.body.classList.contains("dark")?"dark":"light";
+  updateModeText();
+  save();
+}
+function updateModeText(){
+  modeText.textContent=document.body.classList.contains("dark")
+    ?"Light Mode"
+    :"Dark Mode";
+}
+
+nameInput.oninput=e=>{
+  state.name=e.target.value||"Hodded Habits";
+  title.textContent=state.name;
+  save();
+};
+colorPicker.oninput=e=>{
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",e.target.value);
+  save();
+};
+
+/* CALENDAR */
 const app=document.getElementById("app");
 const years=[2026,2027,2028,2029,2030,2031,2032,2033,2034];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-
-let state=JSON.parse(localStorage.getItem("hh"))||{data:{}};
 let current={year:null,month:null,day:null};
 let chart=null;
 
-/* VIEWS */
 function showYears(){
   app.innerHTML=`
     <div class="grid years">
@@ -174,7 +322,7 @@ function showYears(){
 function showMonths(y){
   current.year=y;
   app.innerHTML=`
-    <div class="back" onclick="showYears()">← Back to Years</div>
+    <div class="back-link" onclick="showYears()">← Back to Years</div>
     <div class="grid months">
       ${months.map((m,i)=>`
         <div class="card" onclick="showDays(${i})">
@@ -189,7 +337,7 @@ function showDays(m){
   current.month=m;
   const days=new Date(current.year,m+1,0).getDate();
   app.innerHTML=`
-    <div class="back" onclick="showMonths(${current.year})">← Back to Months</div>
+    <div class="back-link" onclick="showMonths(${current.year})">← Back to Months</div>
     <div class="month-header">${months[m]} ${current.year}</div>
     <div class="grid days">
       ${Array.from({length:days},(_,d)=>`
@@ -200,24 +348,27 @@ function showDays(m){
 /* DAY PANEL */
 function openDay(d){
   current.day=d;
-  const key=`${current.year}-${current.month}-${d}`;
   panel.classList.add("open");
+  const key=`${current.year}-${current.month}-${d}`;
   panelDate.textContent=`${months[current.month]} ${d}, ${current.year}`;
   renderTasks(key);
 }
-function closePanel(){panel.classList.remove("open")}
-
+function closePanel(){
+  panel.classList.remove("open");
+}
 function addTask(){
   const key=`${current.year}-${current.month}-${current.day}`;
   if(!taskInput.value)return;
   state.data[key]=state.data[key]||[];
   state.data[key].push({t:taskInput.value,d:false});
   taskInput.value="";
-  save();renderTasks(key);
+  save();
+  renderTasks(key);
 }
 function toggleTask(key,i){
   state.data[key][i].d=!state.data[key][i].d;
-  save();renderTasks(key);
+  save();
+  renderTasks(key);
 }
 function renderTasks(key){
   const list=state.data[key]||[];
@@ -235,11 +386,13 @@ function renderTasks(key){
   if(chart)chart.destroy();
   chart=new Chart(pie,{
     type:"pie",
-    data:{labels:["Done","Left"],datasets:[{data:[done,list.length-done],backgroundColor:[ "#2563eb","#cbd5e1"]}]},
+    data:{
+      labels:["Done","Left"],
+      datasets:[{data:[done,list.length-done],backgroundColor:[state.accent,"#cbd5e1"]}]
+    },
     options:{plugins:{legend:{position:"bottom"}}}
   });
 }
-function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
 showYears();
 </script>
