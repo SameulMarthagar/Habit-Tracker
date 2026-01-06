@@ -13,18 +13,11 @@
   --accent:#2563eb;
 }
 
-body.dark{
-  --bg:#0f172a;
-  --card:#020617;
-  --text:#e5e7eb;
-}
-
 body{
   margin:0;
   font-family:system-ui,-apple-system,BlinkMacSystemFont;
   background:var(--bg);
   color:var(--text);
-  transition:.3s;
 }
 
 header{
@@ -37,43 +30,64 @@ header{
 }
 header h1{margin-left:auto;font-size:18px}
 
-.menu-btn{font-size:22px;cursor:pointer;margin-right:12px}
-
 main{padding:16px}
 
 /* GRID */
 .grid{
   display:grid;
-  gap:12px;
+  gap:14px;
 }
 
-.years{
-  grid-template-columns:repeat(3,1fr);
-}
-
-.months{
-  grid-template-columns:repeat(3,1fr);
-}
+.years{grid-template-columns:repeat(3,1fr)}
+.months{grid-template-columns:repeat(3,1fr)}
+.days{grid-template-columns:repeat(7,1fr)}
 
 .card{
   background:var(--card);
   border-radius:14px;
-  padding:20px;
-  text-align:center;
-  cursor:pointer;
+  padding:12px;
   box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
-.card:hover{
-  background:var(--accent);
-  color:white;
+
+.card.clickable{
+  cursor:pointer;
+}
+.card.clickable:hover{
+  outline:2px solid var(--accent);
 }
 
-/* BACK */
 .back{
-  margin-bottom:12px;
-  cursor:pointer;
   color:var(--accent);
+  cursor:pointer;
+  margin-bottom:12px;
   font-size:14px;
+}
+
+/* MINI CALENDAR */
+.mini-cal{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+  margin-top:8px;
+}
+.mini-day{
+  font-size:10px;
+  text-align:center;
+  padding:4px 0;
+  border-radius:6px;
+  background:#e5e7eb;
+}
+
+/* FULL CALENDAR */
+.day{
+  padding:10px 0;
+  text-align:center;
+  border-radius:8px;
+  background:#e5e7eb;
+}
+.day:hover{
+  background:var(--accent);
+  color:white;
 }
 </style>
 </head>
@@ -81,22 +95,21 @@ main{padding:16px}
 <body>
 
 <header>
-  <span class="menu-btn">☰</span>
   <h1>Hodded Habits</h1>
 </header>
 
 <main id="app"></main>
 
 <script>
-const app=document.getElementById("app");
+const app = document.getElementById("app");
 
-const years=[
+const years = [
   2026,2027,2028,
   2029,2030,2031,
   2032,2033,2034
 ];
 
-const months=[
+const months = [
   "January","February","March",
   "April","May","June",
   "July","August","September",
@@ -104,20 +117,50 @@ const months=[
 ];
 
 function showYears(){
-  app.innerHTML=`
+  app.innerHTML = `
     <h2>Select Year</h2>
     <div class="grid years">
-      ${years.map(y=>`<div class="card" onclick="showMonths(${y})">${y}</div>`).join("")}
+      ${years.map(y=>`
+        <div class="card clickable" onclick="showMonths(${y})">${y}</div>
+      `).join("")}
     </div>
   `;
 }
 
+function miniCalendar(){
+  let html="";
+  for(let i=1;i<=28;i++){
+    html+=`<div class="mini-day">${i}</div>`;
+  }
+  return html;
+}
+
 function showMonths(year){
-  app.innerHTML=`
+  app.innerHTML = `
     <div class="back" onclick="showYears()">← Back to Years</div>
     <h2>${year}</h2>
     <div class="grid months">
-      ${months.map(m=>`<div class="card">${m}</div>`).join("")}
+      ${months.map((m,i)=>`
+        <div class="card clickable" onclick="showMonthDays(${year},${i})">
+          <strong>${m}</strong>
+          <div class="mini-cal">
+            ${miniCalendar()}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function showMonthDays(year,monthIndex){
+  const daysInMonth = new Date(year, monthIndex+1, 0).getDate();
+  app.innerHTML = `
+    <div class="back" onclick="showMonths(${year})">← Back to Months</div>
+    <h2>${months[monthIndex]} ${year}</h2>
+    <div class="grid days">
+      ${Array.from({length:daysInMonth},(_,i)=>`
+        <div class="day">${i+1}</div>
+      `).join("")}
     </div>
   `;
 }
