@@ -19,8 +19,6 @@ body.dark{
   --text:#e5e7eb;
 }
 
-*{box-sizing:border-box}
-
 body{
   margin:0;
   font-family:system-ui,-apple-system,BlinkMacSystemFont;
@@ -29,7 +27,6 @@ body{
   transition:.3s;
 }
 
-/* HEADER */
 header{
   height:60px;
   background:var(--card);
@@ -38,157 +35,94 @@ header{
   padding:0 16px;
   box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
-.menu-btn{font-size:22px;cursor:pointer;margin-right:12px}
-header img{height:34px}
 header h1{margin-left:auto;font-size:18px}
 
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;left:-260px;
-  width:260px;height:100%;
-  background:var(--card);
-  padding:16px;
-  transition:.3s;
-  box-shadow:2px 0 12px rgba(0,0,0,.2);
-}
-#sidebar.open{left:0}
+.menu-btn{font-size:22px;cursor:pointer;margin-right:12px}
 
-.back-btn{
-  background:none;
-  border:none;
-  color:var(--accent);
-  cursor:pointer;
-  margin-bottom:10px;
-}
-
-/* TOGGLE */
-.toggle{
-  width:52px;height:26px;
-  background:#cbd5e1;
-  border-radius:999px;
-  position:relative;
-  cursor:pointer;
-}
-.toggle::after{
-  content:"";
-  width:20px;height:20px;
-  background:white;
-  border-radius:50%;
-  position:absolute;
-  top:3px;left:3px;
-  transition:.3s;
-}
-body.dark .toggle{
-  background:var(--accent);
-}
-body.dark .toggle::after{
-  transform:translateX(26px);
-}
-
-/* THEME BUTTONS */
-.theme-btn{
-  width:100%;
-  padding:8px;
-  border:none;
-  border-radius:8px;
-  margin-top:6px;
-  cursor:pointer;
-  color:white;
-}
-.blue{background:#2563eb}
-.green{background:#16a34a}
-.purple{background:#7c3aed}
-.orange{background:#ea580c}
-
-/* INPUT */
-input{width:100%;margin-top:6px}
-
-/* MAIN */
 main{padding:16px}
+
+/* GRID */
+.grid{
+  display:grid;
+  gap:12px;
+}
+
+.years{
+  grid-template-columns:repeat(3,1fr);
+}
+
+.months{
+  grid-template-columns:repeat(3,1fr);
+}
+
 .card{
   background:var(--card);
-  padding:16px;
   border-radius:14px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
   box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.card:hover{
+  background:var(--accent);
+  color:white;
+}
+
+/* BACK */
+.back{
+  margin-bottom:12px;
+  cursor:pointer;
+  color:var(--accent);
+  font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <button class="back-btn" onclick="toggleSidebar()">← Back</button>
-  <h3>Settings</h3>
-
-  <!-- MODE -->
-  <p id="modeText">Dark Mode</p>
-  <div class="toggle" onclick="toggleTheme()"></div>
-
-  <!-- THEME PRESETS -->
-  <p>Theme Presets</p>
-  <button class="theme-btn blue" onclick="setTheme('#2563eb')">Blue</button>
-  <button class="theme-btn green" onclick="setTheme('#16a34a')">Green</button>
-  <button class="theme-btn purple" onclick="setTheme('#7c3aed')">Purple</button>
-  <button class="theme-btn orange" onclick="setTheme('#ea580c')">Orange</button>
-
-  <!-- CUSTOM -->
-  <p>Custom Theme Color</p>
-  <input type="color" id="colorPicker">
-</div>
-
-<!-- HEADER -->
 <header>
-  <span class="menu-btn" onclick="toggleSidebar()">☰</span>
-  <img src="logo.png">
+  <span class="menu-btn">☰</span>
   <h1>Hodded Habits</h1>
 </header>
 
-<main>
-  <div class="card">
-    <h2>Welcome</h2>
-    <p>This is your habit dashboard.</p>
-  </div>
-</main>
+<main id="app"></main>
 
 <script>
-let state=JSON.parse(localStorage.getItem("hh"))||{
-  theme:"light",
-  accent:"#2563eb"
-};
+const app=document.getElementById("app");
 
-function save(){localStorage.setItem("hh",JSON.stringify(state))}
+const years=[
+  2026,2027,2028,
+  2029,2030,2031,
+  2032,2033,2034
+];
 
-document.documentElement.style.setProperty("--accent",state.accent);
-document.getElementById("colorPicker").value=state.accent;
+const months=[
+  "January","February","March",
+  "April","May","June",
+  "July","August","September",
+  "October","November","December"
+];
 
-if(state.theme==="dark") document.body.classList.add("dark");
-updateText();
-
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("open");
+function showYears(){
+  app.innerHTML=`
+    <h2>Select Year</h2>
+    <div class="grid years">
+      ${years.map(y=>`<div class="card" onclick="showMonths(${y})">${y}</div>`).join("")}
+    </div>
+  `;
 }
 
-function toggleTheme(){
-  document.body.classList.toggle("dark");
-  state.theme=document.body.classList.contains("dark")?"dark":"light";
-  updateText(); save();
+function showMonths(year){
+  app.innerHTML=`
+    <div class="back" onclick="showYears()">← Back to Years</div>
+    <h2>${year}</h2>
+    <div class="grid months">
+      ${months.map(m=>`<div class="card">${m}</div>`).join("")}
+    </div>
+  `;
 }
 
-function updateText(){
-  document.getElementById("modeText").textContent=
-    document.body.classList.contains("dark")?"Light Mode":"Dark Mode";
-}
-
-function setTheme(color){
-  document.documentElement.style.setProperty("--accent",color);
-  state.accent=color; save();
-}
-
-document.getElementById("colorPicker").oninput=e=>{
-  setTheme(e.target.value);
-};
+showYears();
 </script>
 
 </body>
