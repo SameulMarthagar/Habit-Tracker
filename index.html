@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+/* ===== THEME (GLOBAL – SETTINGS CONTROLLED) ===== */
 :root{
   --bg:#f8fafc;
   --card:#ffffff;
@@ -25,9 +26,10 @@ body{
   font-family:system-ui;
   background:var(--bg);
   color:var(--text);
+  transition:.3s;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 header{
   height:60px;
   background:var(--card);
@@ -40,13 +42,11 @@ header{
 header img{height:34px}
 header h1{margin-left:auto;font-size:18px}
 
-/* SETTINGS SIDEBAR */
+/* ===== SETTINGS SIDEBAR ===== */
 #sidebar{
   position:fixed;
-  top:0;
-  left:-300px;
-  width:300px;
-  height:100%;
+  top:0;left:-300px;
+  width:300px;height:100%;
   background:var(--card);
   padding:16px;
   transition:.3s;
@@ -54,14 +54,9 @@ header h1{margin-left:auto;font-size:18px}
   z-index:3000;
 }
 #sidebar.open{left:0}
+.back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
-.back{
-  cursor:pointer;
-  color:var(--accent);
-  margin-bottom:14px;
-}
-
-/* TOGGLE */
+/* Toggle */
 .toggle-wrap{
   display:flex;
   justify-content:space-between;
@@ -69,8 +64,7 @@ header h1{margin-left:auto;font-size:18px}
   margin:14px 0;
 }
 .toggle{
-  width:52px;
-  height:26px;
+  width:52px;height:26px;
   background:#cbd5e1;
   border-radius:999px;
   position:relative;
@@ -78,54 +72,31 @@ header h1{margin-left:auto;font-size:18px}
 }
 .toggle::after{
   content:"";
-  width:20px;
-  height:20px;
+  width:20px;height:20px;
   background:white;
   border-radius:50%;
   position:absolute;
-  top:3px;
-  left:3px;
+  top:3px;left:3px;
   transition:.3s;
 }
-body.dark .toggle{
-  background:var(--accent);
-}
-body.dark .toggle::after{
-  transform:translateX(26px);
-}
+body.dark .toggle{background:var(--accent)}
+body.dark .toggle::after{transform:translateX(26px)}
 
-label{
-  font-size:13px;
-  display:block;
-  margin-top:12px;
-}
-input{
-  width:100%;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-top:6px;
-}
+label{font-size:13px;display:block;margin-top:12px}
+input{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:6px}
 
-/* MAIN */
-main{
-  padding:24px;
-  display:flex;
-  justify-content:center;
-}
-#app{
-  width:100%;
-  max-width:1100px;
-}
+/* ===== MAIN ===== */
+main{padding:24px;display:flex;justify-content:center}
+#app{width:100%;max-width:1100px}
 
-/* GRIDS */
+/* ===== GRIDS ===== */
 .grid{display:grid;gap:20px}
 .years{grid-template-columns:repeat(3,1fr)}
 .months{grid-template-columns:repeat(4,1fr)}
 .days{grid-template-columns:repeat(7,1fr)}
 
+/* ===== CARDS ===== */
 .card{
-  background:var(--card);
   border-radius:18px;
   padding:28px 20px;
   text-align:center;
@@ -133,10 +104,10 @@ main{
   cursor:pointer;
   font-size:20px;
   font-weight:600;
-  color:#fff;
+  color:white;
 }
 
-/* MINI CALENDAR */
+/* ===== MINI CALENDAR ===== */
 .mini{
   display:grid;
   grid-template-columns:repeat(7,1fr);
@@ -144,14 +115,14 @@ main{
   margin-top:12px;
 }
 .mini div{
-  background:rgba(255,255,255,.8);
+  background:rgba(255,255,255,.85);
   font-size:11px;
   padding:6px 0;
   border-radius:6px;
   color:#000;
 }
 
-/* BACK LINKS */
+/* ===== BACK LINKS ===== */
 .back-link{
   font-size:16px;
   color:var(--accent);
@@ -159,7 +130,7 @@ main{
   margin-bottom:20px;
 }
 
-/* MONTH */
+/* ===== MONTH VIEW ===== */
 .month-header{
   text-align:center;
   font-size:26px;
@@ -167,48 +138,31 @@ main{
   margin-bottom:24px;
 }
 .day{
-  background:#e5e7eb;
   border-radius:12px;
   padding:18px 0;
   text-align:center;
   font-size:18px;
   cursor:pointer;
-}
-.day:hover{
-  background:var(--accent);
-  color:white;
+  color:#000;
 }
 
-/* DAY PANEL */
+/* ===== DAY PANEL ===== */
 #panel{
   position:fixed;
-  top:0;
-  right:-420px;
-  width:420px;
-  height:100%;
+  top:0;right:-420px;
+  width:420px;height:100%;
   background:var(--card);
   padding:18px;
   transition:.3s;
   z-index:2000;
 }
 #panel.open{right:0}
-
-.task{
-  display:flex;
-  gap:8px;
-  margin-bottom:6px;
-}
+.task{display:flex;gap:8px;margin-bottom:6px}
 .progress{
-  height:10px;
-  background:#e5e7eb;
-  border-radius:999px;
-  overflow:hidden;
-  margin-bottom:12px;
+  height:10px;background:#e5e7eb;
+  border-radius:999px;overflow:hidden;margin-bottom:12px
 }
-.progress div{
-  height:100%;
-  background:var(--accent);
-}
+.progress div{height:100%;background:var(--accent)}
 </style>
 </head>
 
@@ -253,7 +207,7 @@ main{
 </div>
 
 <script>
-/* STATE */
+/* ===== STATE ===== */
 let state=JSON.parse(localStorage.getItem("hh"))||{
   name:"Hodded Habits",
   theme:"light",
@@ -262,7 +216,7 @@ let state=JSON.parse(localStorage.getItem("hh"))||{
 };
 function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
-/* APPLY SETTINGS */
+/* ===== APPLY SETTINGS ===== */
 title.textContent=state.name;
 nameInput.value=state.name;
 document.documentElement.style.setProperty("--accent",state.accent);
@@ -289,13 +243,17 @@ colorPicker.oninput=e=>{
   save();
 };
 
-/* RANDOM COLOR FUNCTION */
-function randomColor(){
-  const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
-  return colors[Math.floor(Math.random()*colors.length)];
+/* ===== RANDOM COLOR (UI ONLY) ===== */
+function randColor(){
+  const c=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
+  return c[Math.floor(Math.random()*c.length)];
+}
+function lightRand(){
+  const c=["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"];
+  return c[Math.floor(Math.random()*c.length)];
 }
 
-/* CALENDAR */
+/* ===== CALENDAR ===== */
 const app=document.getElementById("app");
 const years=[2026,2027,2028,2029,2030,2031,2032,2033,2034];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -305,7 +263,9 @@ let chart=null;
 function showYears(){
   app.innerHTML=`
     <div class="grid years">
-      ${years.map(y=>`<div class="card" style="background:var(--accent)" onclick="showMonths(${y})">${y}</div>`).join("")}
+      ${years.map(y=>`
+        <div class="card" style="background:${randColor()}" onclick="showMonths(${y})">${y}</div>
+      `).join("")}
     </div>`;
 }
 
@@ -315,12 +275,13 @@ function showMonths(y){
     <div class="back-link" onclick="showYears()">← Back to Years</div>
     <div class="grid months">
       ${months.map((m,i)=>`
-        <div class="card" style="background:${randomColor()}" onclick="showDays(${i})">
+        <div class="card" style="background:${randColor()}" onclick="showDays(${i})">
           ${m}
           <div class="mini">
             ${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}
           </div>
-        </div>`).join("")}
+        </div>
+      `).join("")}
     </div>`;
 }
 
@@ -332,11 +293,12 @@ function showDays(m){
     <div class="month-header">${months[m]} ${current.year}</div>
     <div class="grid days">
       ${Array.from({length:days},(_,d)=>`
-        <div class="day" onclick="openDay(${d+1})">${d+1}</div>`).join("")}
+        <div class="day" style="background:${lightRand()}" onclick="openDay(${d+1})">${d+1}</div>
+      `).join("")}
     </div>`;
 }
 
-/* DAY PANEL */
+/* ===== DAY PANEL ===== */
 function openDay(d){
   current.day=d;
   panel.classList.add("open");
