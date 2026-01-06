@@ -1,46 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Habit Tracker Pro</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8" />
+<title>Hodded Habits</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
 :root{
-  --blue:#2563eb;
   --bg:#f8fafc;
+  --text:#0f172a;
   --card:#ffffff;
-  --gray:#cbd5e1;
+  --accent:#2563eb;
 }
 
+body.dark{
+  --bg:#0f172a;
+  --text:#e5e7eb;
+  --card:#020617;
+}
+
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family:system-ui,-apple-system,BlinkMacSystemFont;
   background:var(--bg);
-  color:#0f172a;
+  color:var(--text);
+  transition:.3s;
 }
 
+/* LOADER */
+#loader{
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+#loader img{
+  width:120px;
+  animation:spin 2s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HEADER */
 header{
+  height:60px;
+  background:var(--card);
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+.menu-btn{font-size:22px;cursor:pointer;margin-right:12px}
+header img{height:36px}
+header h1{
+  margin-left:auto;
+  font-size:18px;
+  font-weight:600;
+}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;
+  top:0;left:-260px;
+  width:260px;height:100%;
   background:var(--card);
   padding:16px;
-  font-size:20px;
-  font-weight:600;
-  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  box-shadow:2px 0 10px rgba(0,0,0,.2);
+  transition:.3s;
+  z-index:10;
 }
+#sidebar.open{left:0}
+#sidebar h2{font-size:16px;margin-bottom:12px}
 
-.container{padding:14px}
-
+/* MAIN */
+main{padding:16px}
 .card{
   background:var(--card);
-  border-radius:16px;
+  border-radius:14px;
   padding:16px;
   margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.05);
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
-
-h2{font-size:16px;margin-bottom:12px}
 
 /* CALENDAR */
 .calendar{
@@ -55,189 +99,116 @@ h2{font-size:16px;margin-bottom:12px}
   text-align:center;
   cursor:pointer;
 }
-.day.done{
-  background:var(--blue);
+.day.active{
+  background:var(--accent);
+  color:#fff;
+}
+
+/* DAILY PANEL */
+#daily{
+  position:fixed;
+  top:0;right:-100%;
+  width:100%;max-width:420px;
+  height:100%;
+  background:var(--card);
+  padding:16px;
+  transition:.3s;
+  z-index:20;
+}
+#daily.open{right:0}
+.task{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+.task button{
+  background:red;
   color:white;
+  border:none;
+  border-radius:6px;
+  padding:2px 6px;
 }
 
-/* YEAR GRID */
-.year{
-  display:grid;
-  grid-template-columns:repeat(31,8px);
-  gap:4px;
-}
-.block{
-  width:8px;height:8px;
-  border-radius:2px;
-  background:#e5e7eb;
-}
-.block.done{background:var(--blue)}
-
-.badge{
-  display:inline-block;
-  padding:6px 12px;
-  border-radius:999px;
-  background:var(--blue);
-  color:white;
-  font-size:12px;
-  margin-top:8px;
-}
-
+/* INPUTS */
 input,button{
   padding:8px;
   border-radius:8px;
-  border:1px solid var(--gray);
+  border:1px solid #ccc;
 }
 button{
-  background:var(--blue);
+  background:var(--accent);
   color:white;
   border:none;
-  margin-left:6px;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>🔥 Habit Tracker Pro</header>
-
-<div class="container">
-
-<!-- STREAK + BADGE -->
-<div class="card">
-  <h2>Streak</h2>
-  <p>Current Streak: <b id="streak">0</b> days</p>
-  <div id="badge"></div>
+<!-- LOADER -->
+<div id="loader">
+  <img src="logo.png" alt="logo" />
+  <p>Hodded Habits</p>
 </div>
 
-<!-- MONTH VIEW -->
-<div class="card">
-  <h2>June</h2>
-  <div class="calendar" id="calendar"></div>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <h2>Settings</h2>
+  <button onclick="toggleTheme()">Toggle Light/Dark</button><br><br>
+  <input type="color" onchange="setAccent(this.value)" />
 </div>
 
-<!-- YEAR VIEW -->
-<div class="card">
-  <h2>Year Overview</h2>
-  <div class="year" id="year"></div>
-</div>
+<!-- HEADER -->
+<header>
+  <span class="menu-btn" onclick="toggleSidebar()">☰</span>
+  <img src="logo.png" />
+  <h1>Hodded Habits</h1>
+</header>
 
-<!-- REMINDERS -->
-<div class="card">
-  <h2>Reminders</h2>
-  <input type="date" id="remDate">
-  <input placeholder="Reminder text" id="remText">
-  <button onclick="addReminder()">Add</button>
-  <ul id="reminders"></ul>
-</div>
+<!-- MAIN -->
+<main>
+  <div class="card">
+    <h2>June 2026</h2>
+    <div class="calendar" id="calendar"></div>
+  </div>
+</main>
 
-<!-- PIE CHART -->
-<div class="card">
-  <h2>Progress</h2>
-  <canvas id="pie"></canvas>
-</div>
-
+<!-- DAILY PANEL -->
+<div id="daily">
+  <h2 id="dayTitle"></h2>
+  <input id="taskInput" placeholder="New habit" />
+  <button onclick="addTask()">Add</button>
+  <div id="tasks"></div>
+  <br>
+  <button onclick="closeDaily()">Close</button>
 </div>
 
 <script>
-let state=JSON.parse(localStorage.getItem("tracker"))||{
-  days:Array(365).fill(false),
-  reminders:[]
-};
+/* LOADER */
+setTimeout(()=>document.getElementById("loader").style.display="none",1500)
 
-function save(){localStorage.setItem("tracker",JSON.stringify(state))}
-
-function renderCalendar(){
-  const c=document.getElementById("calendar");
-  c.innerHTML="";
-  for(let i=0;i<30;i++){
-    const d=document.createElement("div");
-    d.className="day"+(state.days[i]?" done":"");
-    d.textContent=i+1;
-    d.onclick=()=>{state.days[i]=!state.days[i];save();renderAll()};
-    c.appendChild(d);
-  }
+/* STATE */
+let state=JSON.parse(localStorage.getItem("hh"))||{
+  tasks:[],
+  days:{},
+  theme:"light",
+  accent:"#2563eb"
 }
+document.documentElement.style.setProperty("--accent",state.accent)
+if(state.theme==="dark")document.body.classList.add("dark")
 
-function renderYear(){
-  const y=document.getElementById("year");
-  y.innerHTML="";
-  state.days.forEach(d=>{
-    const b=document.createElement("div");
-    b.className="block"+(d?" done":"");
-    y.appendChild(b);
-  });
+function save(){localStorage.setItem("hh",JSON.stringify(state))}
+
+/* SIDEBAR */
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("open")
 }
-
-function calcStreak(){
-  let s=0;
-  for(let i=state.days.length-1;i>=0;i--){
-    if(state.days[i]) s++;
-    else break;
-  }
-  document.getElementById("streak").textContent=s;
-
-  let badge="No badge yet";
-  if(s>=100) badge="🏆 Legend (100+)";
-  else if(s>=50) badge="🥇 Gold (50)";
-  else if(s>=21) badge="🥈 Silver (21)";
-  else if(s>=7) badge="🥉 Bronze (7)";
-  document.getElementById("badge").innerHTML=`<span class="badge">${badge}</span>`;
+function toggleTheme(){
+  document.body.classList.toggle("dark")
+  state.theme=document.body.classList.contains("dark")?"dark":"light"
+  save()
 }
-
-function renderChart(){
-  const done=state.days.filter(d=>d).length;
-  const miss=state.days.length-done;
-  new Chart(document.getElementById("pie"),{
-    type:"pie",
-    data:{
-      labels:["Done","Missed"],
-      datasets:[{data:[done,miss],backgroundColor:["#2563eb","#cbd5e1"]}]
-    }
-  });
-}
-
-function addReminder(){
-  const d=document.getElementById("remDate").value;
-  const t=document.getElementById("remText").value;
-  if(!d||!t)return;
-  state.reminders.push({date:d,text:t});
-  save();renderReminders();
-}
-
-function renderReminders(){
-  const r=document.getElementById("reminders");
-  r.innerHTML="";
-  state.reminders.forEach(rem=>{
-    r.innerHTML+=`<li>${rem.date} – ${rem.text}</li>`;
-  });
-}
-
-function notifyCheck(){
-  if(Notification.permission!=="granted") return;
-  const today=new Date().toISOString().slice(0,10);
-  state.reminders.forEach(r=>{
-    if(r.date===today){
-      new Notification("Habit Reminder",{body:r.text});
-    }
-  });
-}
-
-if("Notification"in window){
-  Notification.requestPermission();
-}
-
-function renderAll(){
-  renderCalendar();
-  renderYear();
-  calcStreak();
-  renderReminders();
-  renderChart();
-}
-
-renderAll();
-notifyCheck();
-</script>
-
-</body>
-</html>
+function setAccent(c){
+  document.documentElement.style.setProperty("--accent",c)
+  state.accent=c;sa
