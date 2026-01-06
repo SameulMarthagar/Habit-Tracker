@@ -91,7 +91,7 @@ header h1{
   margin-bottom:12px;
 }
 
-/* SLIDER */
+/* TOGGLE */
 .toggle-wrap{
   display:flex;
   justify-content:space-between;
@@ -105,7 +105,6 @@ header h1{
   border-radius:999px;
   position:relative;
   cursor:pointer;
-  transition:.3s;
 }
 .toggle::after{
   content:"";
@@ -125,14 +124,18 @@ body.dark .toggle::after{
   transform:translateX(26px);
 }
 
-/* MAIN */
-main{padding:16px}
-.card{
-  background:var(--card);
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
+/* INPUTS */
+input{
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-top:6px;
+}
+label{
+  font-size:13px;
+  display:block;
+  margin-top:14px;
 }
 </style>
 </head>
@@ -150,42 +153,60 @@ main{padding:16px}
   <button class="back-btn" onclick="toggleSidebar()">← Back</button>
   <h3>Settings</h3>
 
+  <!-- NAME -->
+  <label>Change Name</label>
+  <input id="nameInput" placeholder="Enter your name">
+
+  <!-- MODE -->
   <div class="toggle-wrap">
     <span id="modeText">Dark Mode</span>
     <div class="toggle" onclick="toggleTheme()"></div>
   </div>
+
+  <!-- COLOR -->
+  <label>Theme Color</label>
+  <input type="color" id="colorPicker">
 </div>
 
 <!-- HEADER -->
 <header>
   <span class="menu-btn" onclick="toggleSidebar()">☰</span>
   <img src="logo.png">
-  <h1>Hodded Habits</h1>
+  <h1 id="username">Hodded Habits</h1>
 </header>
 
 <script>
-window.onload = () => {
-  document.getElementById("loader").style.display = "none";
+window.onload=()=>document.getElementById("loader").style.display="none";
+
+let state=JSON.parse(localStorage.getItem("hh"))||{
+  name:"Hodded Habits",
+  theme:"light",
+  accent:"#2563eb",
+  bg:"#f8fafc",
+  card:"#ffffff"
 };
 
-let state = JSON.parse(localStorage.getItem("hh")) || {
-  theme: "light"
-};
+function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
-const modeText = document.getElementById("modeText");
+/* APPLY STATE */
+document.getElementById("username").textContent=state.name;
+document.getElementById("nameInput").value=state.name;
+document.documentElement.style.setProperty("--accent",state.accent);
+document.getElementById("colorPicker").value=state.accent;
 
-function updateModeText(){
-  if(document.body.classList.contains("dark")){
-    modeText.textContent = "Light Mode";
-  }else{
-    modeText.textContent = "Dark Mode";
-  }
-}
+const modeText=document.getElementById("modeText");
 
-if(state.theme === "dark"){
+if(state.theme==="dark"){
   document.body.classList.add("dark");
 }
 updateModeText();
+
+/* FUNCTIONS */
+function updateModeText(){
+  modeText.textContent=document.body.classList.contains("dark")
+    ?"Light Mode"
+    :"Dark Mode";
+}
 
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("open");
@@ -193,11 +214,26 @@ function toggleSidebar(){
 
 function toggleTheme(){
   document.body.classList.toggle("dark");
-  state.theme = document.body.classList.contains("dark") ? "dark" : "light";
+  state.theme=document.body.classList.contains("dark")?"dark":"light";
   updateModeText();
-  localStorage.setItem("hh", JSON.stringify(state));
+  save();
 }
+
+/* NAME CHANGE */
+document.getElementById("nameInput").oninput=e=>{
+  state.name=e.target.value||"Hodded Habits";
+  document.getElementById("username").textContent=state.name;
+  save();
+};
+
+/* COLOR CHANGE */
+document.getElementById("colorPicker").oninput=e=>{
+  document.documentElement.style.setProperty("--accent",e.target.value);
+  state.accent=e.target.value;
+  save();
+};
 </script>
 
 </body>
 </html>
+
