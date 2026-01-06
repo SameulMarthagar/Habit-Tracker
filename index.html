@@ -7,16 +7,16 @@
 
 <style>
 :root{
-  --accent:#2563eb;
   --bg:#f8fafc;
-  --text:#0f172a;
   --card:#ffffff;
+  --text:#0f172a;
+  --accent:#2563eb;
 }
 
 body.dark{
   --bg:#0f172a;
-  --text:#e5e7eb;
   --card:#020617;
+  --text:#e5e7eb;
 }
 
 *{box-sizing:border-box}
@@ -29,23 +29,6 @@ body{
   transition:.3s;
 }
 
-/* LOADER */
-#loader{
-  position:fixed;
-  inset:0;
-  background:var(--bg);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-#loader img{
-  width:110px;
-  animation:spin 1.8s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
 /* HEADER */
 header{
   height:60px;
@@ -55,52 +38,33 @@ header{
   padding:0 16px;
   box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
-.menu-btn{
-  font-size:22px;
-  cursor:pointer;
-  margin-right:12px;
-}
+.menu-btn{font-size:22px;cursor:pointer;margin-right:12px}
 header img{height:34px}
-header h1{
-  margin-left:auto;
-  font-size:18px;
-  font-weight:600;
-}
+header h1{margin-left:auto;font-size:18px}
 
 /* SIDEBAR */
 #sidebar{
   position:fixed;
-  top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
+  top:0;left:-260px;
+  width:260px;height:100%;
   background:var(--card);
   padding:16px;
-  box-shadow:2px 0 12px rgba(0,0,0,.2);
   transition:.3s;
-  z-index:1000;
+  box-shadow:2px 0 12px rgba(0,0,0,.2);
 }
 #sidebar.open{left:0}
 
 .back-btn{
   background:none;
   border:none;
-  font-size:14px;
-  cursor:pointer;
   color:var(--accent);
-  margin-bottom:12px;
+  cursor:pointer;
+  margin-bottom:10px;
 }
 
 /* TOGGLE */
-.toggle-wrap{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:14px 0;
-}
 .toggle{
-  width:54px;
-  height:28px;
+  width:52px;height:26px;
   background:#cbd5e1;
   border-radius:999px;
   position:relative;
@@ -108,13 +72,11 @@ header h1{
 }
 .toggle::after{
   content:"";
-  width:22px;
-  height:22px;
+  width:20px;height:20px;
   background:white;
   border-radius:50%;
   position:absolute;
-  top:3px;
-  left:3px;
+  top:3px;left:3px;
   transition:.3s;
 }
 body.dark .toggle{
@@ -124,47 +86,55 @@ body.dark .toggle::after{
   transform:translateX(26px);
 }
 
-/* INPUTS */
-input{
+/* THEME BUTTONS */
+.theme-btn{
   width:100%;
   padding:8px;
+  border:none;
   border-radius:8px;
-  border:1px solid #ccc;
   margin-top:6px;
+  cursor:pointer;
+  color:white;
 }
-label{
-  font-size:13px;
-  display:block;
-  margin-top:14px;
+.blue{background:#2563eb}
+.green{background:#16a34a}
+.purple{background:#7c3aed}
+.orange{background:#ea580c}
+
+/* INPUT */
+input{width:100%;margin-top:6px}
+
+/* MAIN */
+main{padding:16px}
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <img src="logo.png">
-  <p>Hodded Habits</p>
-</div>
-
 <!-- SIDEBAR -->
 <div id="sidebar">
   <button class="back-btn" onclick="toggleSidebar()">← Back</button>
   <h3>Settings</h3>
 
-  <!-- NAME -->
-  <label>Change Name</label>
-  <input id="nameInput" placeholder="Enter your name">
-
   <!-- MODE -->
-  <div class="toggle-wrap">
-    <span id="modeText">Dark Mode</span>
-    <div class="toggle" onclick="toggleTheme()"></div>
-  </div>
+  <p id="modeText">Dark Mode</p>
+  <div class="toggle" onclick="toggleTheme()"></div>
 
-  <!-- COLOR -->
-  <label>Theme Color</label>
+  <!-- THEME PRESETS -->
+  <p>Theme Presets</p>
+  <button class="theme-btn blue" onclick="setTheme('#2563eb')">Blue</button>
+  <button class="theme-btn green" onclick="setTheme('#16a34a')">Green</button>
+  <button class="theme-btn purple" onclick="setTheme('#7c3aed')">Purple</button>
+  <button class="theme-btn orange" onclick="setTheme('#ea580c')">Orange</button>
+
+  <!-- CUSTOM -->
+  <p>Custom Theme Color</p>
   <input type="color" id="colorPicker">
 </div>
 
@@ -172,41 +142,29 @@ label{
 <header>
   <span class="menu-btn" onclick="toggleSidebar()">☰</span>
   <img src="logo.png">
-  <h1 id="username">Hodded Habits</h1>
+  <h1>Hodded Habits</h1>
 </header>
 
-<script>
-window.onload=()=>document.getElementById("loader").style.display="none";
+<main>
+  <div class="card">
+    <h2>Welcome</h2>
+    <p>This is your habit dashboard.</p>
+  </div>
+</main>
 
+<script>
 let state=JSON.parse(localStorage.getItem("hh"))||{
-  name:"Hodded Habits",
   theme:"light",
-  accent:"#2563eb",
-  bg:"#f8fafc",
-  card:"#ffffff"
+  accent:"#2563eb"
 };
 
 function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
-/* APPLY STATE */
-document.getElementById("username").textContent=state.name;
-document.getElementById("nameInput").value=state.name;
 document.documentElement.style.setProperty("--accent",state.accent);
 document.getElementById("colorPicker").value=state.accent;
 
-const modeText=document.getElementById("modeText");
-
-if(state.theme==="dark"){
-  document.body.classList.add("dark");
-}
-updateModeText();
-
-/* FUNCTIONS */
-function updateModeText(){
-  modeText.textContent=document.body.classList.contains("dark")
-    ?"Light Mode"
-    :"Dark Mode";
-}
+if(state.theme==="dark") document.body.classList.add("dark");
+updateText();
 
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("open");
@@ -215,25 +173,23 @@ function toggleSidebar(){
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
-  updateModeText();
-  save();
+  updateText(); save();
 }
 
-/* NAME CHANGE */
-document.getElementById("nameInput").oninput=e=>{
-  state.name=e.target.value||"Hodded Habits";
-  document.getElementById("username").textContent=state.name;
-  save();
-};
+function updateText(){
+  document.getElementById("modeText").textContent=
+    document.body.classList.contains("dark")?"Light Mode":"Dark Mode";
+}
 
-/* COLOR CHANGE */
+function setTheme(color){
+  document.documentElement.style.setProperty("--accent",color);
+  state.accent=color; save();
+}
+
 document.getElementById("colorPicker").oninput=e=>{
-  document.documentElement.style.setProperty("--accent",e.target.value);
-  state.accent=e.target.value;
-  save();
+  setTheme(e.target.value);
 };
 </script>
 
 </body>
 </html>
-
