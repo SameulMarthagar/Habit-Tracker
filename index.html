@@ -5,6 +5,8 @@
 <title>Hodded Habits</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 :root{
   --bg:#f8fafc;
@@ -20,153 +22,210 @@ body{
   color:var(--text);
 }
 
+/* HEADER */
 header{
   height:60px;
   background:var(--card);
   display:flex;
   align-items:center;
-  padding:0 16px;
+  justify-content:center;
+  font-size:18px;
+  font-weight:600;
   box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
-header h1{margin-left:auto;font-size:18px}
 
-main{padding:16px}
-
-/* GRID */
-.grid{
-  display:grid;
-  gap:14px;
+/* MAIN */
+main{
+  display:flex;
+  justify-content:center;
+  padding:20px;
 }
 
-.years{grid-template-columns:repeat(3,1fr)}
-.months{grid-template-columns:repeat(3,1fr)}
-.days{grid-template-columns:repeat(7,1fr)}
-
-.card{
+/* MONTH CONTAINER */
+.month-box{
+  width:100%;
+  max-width:520px;
   background:var(--card);
-  border-radius:14px;
-  padding:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 6px 16px rgba(0,0,0,.1);
 }
 
-.card.clickable{
-  cursor:pointer;
-}
-.card.clickable:hover{
-  outline:2px solid var(--accent);
-}
-
-.back{
-  color:var(--accent);
-  cursor:pointer;
-  margin-bottom:12px;
-  font-size:14px;
-}
-
-/* MINI CALENDAR */
-.mini-cal{
+.days{
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:4px;
-  margin-top:8px;
-}
-.mini-day{
-  font-size:10px;
-  text-align:center;
-  padding:4px 0;
-  border-radius:6px;
-  background:#e5e7eb;
+  gap:8px;
 }
 
-/* FULL CALENDAR */
 .day{
-  padding:10px 0;
+  padding:12px 0;
   text-align:center;
-  border-radius:8px;
+  border-radius:10px;
   background:#e5e7eb;
+  cursor:pointer;
 }
 .day:hover{
   background:var(--accent);
   color:white;
+}
+
+/* SLIDING PANEL */
+#panel{
+  position:fixed;
+  top:0;
+  right:-380px;
+  width:380px;
+  height:100%;
+  background:var(--card);
+  box-shadow:-4px 0 12px rgba(0,0,0,.2);
+  transition:.3s;
+  padding:16px;
+}
+#panel.open{
+  right:0;
+}
+
+.task{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+}
+.task input[type="checkbox"]{
+  transform:scale(1.2);
+}
+
+/* PROGRESS BAR */
+.progress{
+  height:10px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.progress-fill{
+  height:100%;
+  background:var(--accent);
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Hodded Habits</h1>
-</header>
+<header>June 2026</header>
 
-<main id="app"></main>
+<main>
+  <div class="month-box">
+    <div class="days" id="days"></div>
+  </div>
+</main>
+
+<!-- RIGHT PANEL -->
+<div id="panel">
+  <h3 id="panelDate"></h3>
+
+  <!-- PROGRESS -->
+  <div class="progress">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- TASK INPUT -->
+  <input id="taskInput" placeholder="Add task" style="width:100%;padding:8px">
+  <button onclick="addTask()" style="margin:8px 0;width:100%">Add</button>
+
+  <!-- TASK LIST -->
+  <div id="tasks"></div>
+
+  <!-- PIE -->
+  <canvas id="pie" height="180"></canvas>
+
+  <button onclick="closePanel()" style="margin-top:10px;width:100%">Close</button>
+</div>
 
 <script>
-const app = document.getElementById("app");
+const daysEl=document.getElementById("days");
+const panel=document.getElementById("panel");
+const panelDate=document.getElementById("panelDate");
+const tasksEl=document.getElementById("tasks");
+const progressFill=document.getElementById("progressFill");
 
-const years = [
-  2026,2027,2028,
-  2029,2030,2031,
-  2032,2033,2034
-];
+let data=JSON.parse(localStorage.getItem("hh-days"))||{};
+let currentDay=null;
+let chart=null;
 
-const months = [
-  "January","February","March",
-  "April","May","June",
-  "July","August","September",
-  "October","November","December"
-];
-
-function showYears(){
-  app.innerHTML = `
-    <h2>Select Year</h2>
-    <div class="grid years">
-      ${years.map(y=>`
-        <div class="card clickable" onclick="showMonths(${y})">${y}</div>
-      `).join("")}
-    </div>
-  `;
+/* RENDER DAYS */
+for(let i=1;i<=30;i++){
+  const d=document.createElement("div");
+  d.className="day";
+  d.textContent=i;
+  d.onclick=()=>openDay(i);
+  daysEl.appendChild(d);
 }
 
-function miniCalendar(){
-  let html="";
-  for(let i=1;i<=28;i++){
-    html+=`<div class="mini-day">${i}</div>`;
-  }
-  return html;
+function openDay(day){
+  currentDay=day;
+  panelDate.textContent=`June ${day}, 2026`;
+  panel.classList.add("open");
+  renderTasks();
 }
 
-function showMonths(year){
-  app.innerHTML = `
-    <div class="back" onclick="showYears()">← Back to Years</div>
-    <h2>${year}</h2>
-    <div class="grid months">
-      ${months.map((m,i)=>`
-        <div class="card clickable" onclick="showMonthDays(${year},${i})">
-          <strong>${m}</strong>
-          <div class="mini-cal">
-            ${miniCalendar()}
-          </div>
-        </div>
-      `).join("")}
-    </div>
-  `;
+function closePanel(){
+  panel.classList.remove("open");
 }
 
-function showMonthDays(year,monthIndex){
-  const daysInMonth = new Date(year, monthIndex+1, 0).getDate();
-  app.innerHTML = `
-    <div class="back" onclick="showMonths(${year})">← Back to Months</div>
-    <h2>${months[monthIndex]} ${year}</h2>
-    <div class="grid days">
-      ${Array.from({length:daysInMonth},(_,i)=>`
-        <div class="day">${i+1}</div>
-      `).join("")}
-    </div>
-  `;
+/* TASKS */
+function addTask(){
+  const input=document.getElementById("taskInput");
+  if(!input.value) return;
+  data[currentDay]=data[currentDay]||[];
+  data[currentDay].push({text:input.value,done:false});
+  input.value="";
+  save();renderTasks();
 }
 
-showYears();
+function toggleTask(i){
+  data[currentDay][i].done=!data[currentDay][i].done;
+  save();renderTasks();
+}
+
+function renderTasks(){
+  tasksEl.innerHTML="";
+  const list=data[currentDay]||[];
+  let done=0;
+  list.forEach((t,i)=>{
+    if(t.done) done++;
+    tasksEl.innerHTML+=`
+      <div class="task">
+        <input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${i})">
+        ${t.text}
+      </div>`;
+  });
+
+  const percent=list.length?done/list.length*100:0;
+  progressFill.style.width=percent+"%";
+  renderChart(done,list.length-done);
+}
+
+function renderChart(done,pending){
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById("pie"),{
+    type:"pie",
+    data:{
+      labels:["Done","Pending"],
+      datasets:[{
+        data:[done,pending],
+        backgroundColor:["#2563eb","#cbd5e1"]
+      }]
+    },
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+}
+
+function save(){
+  localStorage.setItem("hh-days",JSON.stringify(data));
+}
 </script>
 
 </body>
 </html>
+
