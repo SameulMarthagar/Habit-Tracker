@@ -211,7 +211,7 @@ button{
   <h3>Settings</h3>
 
   <div class="toggle-wrap">
-    <span>Dark Mode</span>
+    <span id="modeText">Switch to Dark Mode</span>
     <div class="toggle" onclick="toggleTheme()"></div>
   </div>
 
@@ -255,10 +255,18 @@ let state=JSON.parse(localStorage.getItem("hh"))||{
 
 function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
+/* INITIAL THEME */
 document.documentElement.style.setProperty("--accent",state.accent);
 document.getElementById("colorPicker").value=state.accent;
 
-if(state.theme==="dark") document.body.classList.add("dark");
+const modeText=document.getElementById("modeText");
+
+if(state.theme==="dark"){
+  document.body.classList.add("dark");
+  modeText.textContent="Switch to Light Mode";
+}else{
+  modeText.textContent="Switch to Dark Mode";
+}
 
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("open");
@@ -267,6 +275,9 @@ function toggleSidebar(){
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
+  modeText.textContent=state.theme==="dark"
+    ?"Switch to Light Mode"
+    :"Switch to Dark Mode";
   save();
 }
 
