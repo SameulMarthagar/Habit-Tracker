@@ -48,7 +48,13 @@ header h1{margin-left:auto;font-size:18px}
   z-index:4000;
 }
 #sidebar.open{left:0}
-.back{cursor:pointer;color:var(--accent);margin-bottom:14px}
+
+/* 🔹 UPDATED BACK SPACING HERE */
+.back{
+  cursor:pointer;
+  color:var(--accent);
+  margin-bottom:48px; /* 3–4 lines space */
+}
 
 .toggle-wrap{
   display:flex;justify-content:space-between;align-items:center;margin:14px 0
@@ -294,47 +300,34 @@ nameInput.oninput=e=>{
 
 /* CALENDAR */
 const app=document.getElementById("app");
-
-/* 3 × 3 × 3 YEARS = 27 */
 const years=Array.from({length:27},(_,i)=>2026+i);
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let currentKey=null;
 
 function showYears(){
-  app.innerHTML=`<div class="grid years">${
-    years.map(y=>{
-      const yc=pick();
-      return `<div class="card" style="background:${yc}" onclick="showMonths(${y},'${yc}')">${y}</div>`;
-    }).join("")
-  }</div>`;
+  app.innerHTML=`<div class="grid years">${years.map(y=>`
+    <div class="card" style="background:${pick()}" onclick="showMonths(${y})">${y}</div>
+  `).join("")}</div>`;
 }
-
-function showMonths(y,yc){
+function showMonths(y){
   app.innerHTML=`<span class="back" onclick="showYears()">← Back</span>
-  <div class="grid months">${
-    months.map((m,i)=>{
-      const mc=pick([yc]);
-      const d=new Date(y,i+1,0).getDate();
-      return `
-      <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
-        ${m}
-        <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
-      </div>`;
-    }).join("")
-  }</div>`;
+  <div class="grid months">${months.map((m,i)=>{
+    const d=new Date(y,i+1,0).getDate();
+    return `
+    <div class="card" style="background:${pick()}" onclick="showDays(${y},${i})">
+      ${m}
+      <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
+    </div>`;
+  }).join("")}</div>`;
 }
-
-function showDays(y,m,yc,mc){
+function showDays(y,m){
   const days=new Date(y,m+1,0).getDate();
-  app.innerHTML=`<span class="back" onclick="showMonths(${y},'${yc}')">← Back</span>
-  <div class="grid days">${
-    Array.from({length:days},(_,d)=>{
-      const dc=pick([yc,mc]);
-      return `<div class="day" style="background:${dc}"
-        onclick="openTasks('${y}-${m}-${d+1}')"
-        oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`;
-    }).join("")
-  }</div>`;
+  app.innerHTML=`<span class="back" onclick="showMonths(${y})">← Back</span>
+  <div class="grid days">${Array.from({length:days},(_,d)=>`
+    <div class="day" style="background:${pick()}"
+      onclick="openTasks('${y}-${m}-${d+1}')"
+      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>
+  `).join("")}</div>`;
 }
 showYears();
 
