@@ -81,16 +81,25 @@ main{padding:24px;display:flex;justify-content:center}
 .days{grid-template-columns:repeat(7,1fr)}
 
 .card{
-  border-radius:18px;padding:22px;text-align:center;
+  border-radius:18px;
+  padding:22px;
+  text-align:center;
   box-shadow:0 6px 16px rgba(0,0,0,.12);
-  cursor:pointer;font-size:20px;font-weight:600;color:white
+  cursor:pointer;
+  font-size:20px;
+  font-weight:600;
+  color:white
 }
 .day{
-  border-radius:12px;padding:18px 0;text-align:center;
-  font-size:18px;cursor:pointer;color:#000
+  border-radius:12px;
+  padding:18px 0;
+  text-align:center;
+  font-size:18px;
+  cursor:pointer;
+  color:#000
 }
 
-/* MINI DAYS */
+/* MINI DAYS IN MONTH */
 .mini{
   margin-top:12px;
   display:grid;
@@ -107,41 +116,76 @@ main{padding:24px;display:flex;justify-content:center}
 
 /* CONTEXT MENU */
 #contextMenu{
-  position:absolute;background:var(--card);
-  border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.3);
-  display:none;z-index:9000
+  position:absolute;
+  background:var(--card);
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,.3);
+  display:none;
+  z-index:9000
 }
-.context-item{padding:12px 16px;cursor:pointer}
+.context-item{
+  padding:12px 16px;
+  cursor:pointer
+}
 .context-item:hover{background:var(--accent);color:white}
 
 /* REMINDER MODAL */
 #reminderModal{
-  position:fixed;inset:0;background:rgba(0,0,0,.6);
-  display:none;align-items:center;justify-content:center;z-index:9500
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9500
 }
 .modal{
-  background:var(--card);padding:24px;border-radius:20px;
-  width:90%;max-width:440px
+  background:var(--card);
+  padding:24px;
+  border-radius:20px;
+  width:90%;
+  max-width:440px
 }
 
 /* DIARY PANEL */
 #panel{
-  position:fixed;top:0;left:-440px;width:440px;height:100%;
-  padding:18px;background:var(--card);transition:.3s;z-index:3000
+  position:fixed;
+  top:0;
+  left:-440px;
+  width:440px;
+  height:100%;
+  padding:18px;
+  background:var(--card);
+  transition:.3s;
+  z-index:3000
 }
 #panel.open{left:0}
 
 /* TASK PANEL */
 #taskPanel{
-  position:fixed;top:0;right:-360px;width:360px;height:100%;
-  background:var(--card);padding:18px;transition:.3s;z-index:3500
+  position:fixed;
+  top:0;
+  right:-360px;
+  width:360px;
+  height:100%;
+  background:var(--card);
+  padding:18px;
+  transition:.3s;
+  z-index:3500
 }
 #taskPanel.open{right:0}
 
-.task{display:flex;gap:10px;margin-top:10px}
+.task{
+  display:flex;
+  gap:10px;
+  margin-top:10px
+}
 
 .btn{
-  margin-top:12px;padding:10px;border:none;border-radius:10px;cursor:pointer
+  margin-top:12px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer
 }
 .btn.primary{background:var(--accent);color:white}
 .btn.secondary{background:#cbd5e1}
@@ -224,41 +268,38 @@ let state=JSON.parse(localStorage.getItem("hh"))||{
 };
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
 
-/* SETTINGS – FIXED */
+/* SETTINGS */
 function toggleSidebar(){sidebar.classList.toggle("open")}
-
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
   modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
   save();
 }
-
 themePicker.oninput=e=>{
   state.accent=e.target.value;
   document.documentElement.style.setProperty("--accent",state.accent);
   save();
 };
-
 nameInput.oninput=e=>{
   state.name=e.target.value;
   title.textContent=state.name||"Hodded Habits";
   save();
 };
 
-/* APPLY SETTINGS ON LOAD */
-(function initSettings(){
+/* INIT SETTINGS */
+(function(){
   title.textContent=state.name||"Hodded Habits";
   nameInput.value=state.name;
-  document.documentElement.style.setProperty("--accent",state.accent);
   themePicker.value=state.accent;
+  document.documentElement.style.setProperty("--accent",state.accent);
   if(state.theme==="dark") document.body.classList.add("dark");
   modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
 })();
 
 /* CALENDAR */
 const app=document.getElementById("app");
-const years=[2026,2027,2028,2029,2030];
+const years=[2026,2027,2028,2029,2030,2031,2032,2033];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let currentKey=null;
 
