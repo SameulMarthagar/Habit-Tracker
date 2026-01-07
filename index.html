@@ -154,6 +154,52 @@ main{padding:24px;display:flex;justify-content:center}
   color:white
 }
 
+/* CONTEXT MENU */
+#contextMenu{
+  position:absolute;
+  background:var(--card);
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,.3);
+  display:none;
+  z-index:9000
+}
+.context-item{
+  padding:12px 16px;
+  cursor:pointer
+}
+.context-item:hover{background:var(--accent);color:white}
+
+/* REMINDER MODAL */
+#reminderModal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9500
+}
+.modal{
+  background:var(--card);
+  padding:24px;
+  border-radius:20px;
+  width:90%;
+  max-width:440px
+}
+
+/* DIARY PANEL */
+#panel{
+  position:fixed;
+  top:0;
+  left:-440px;
+  width:440px;
+  height:100%;
+  padding:18px;
+  background:var(--card);
+  transition:.3s;
+  z-index:3000
+}
+#panel.open{left:0}
+
 /* TASK PANEL */
 #taskPanel{
   position:fixed;
@@ -168,22 +214,12 @@ main{padding:24px;display:flex;justify-content:center}
 }
 #taskPanel.open{right:0}
 
-/* ✅ UPDATED TASK LAYOUT (ONLY ADDITION) */
 .task{
   display:flex;
-  align-items:center;
-  gap:12px;
+  gap:10px;
   margin-top:10px
 }
-.task input[type="text"]{
-  flex:1;
-}
-.task input[type="checkbox"]{
-  width:20px;
-  height:20px;
-}
 
-/* BUTTONS */
 .btn{
   margin-top:12px;
   padding:10px;
@@ -222,6 +258,32 @@ main{padding:24px;display:flex;justify-content:center}
 
 <main><div id="app"></div></main>
 
+<!-- CONTEXT MENU -->
+<div id="contextMenu" onclick="event.stopPropagation()">
+  <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
+  <div class="context-item" onclick="openDiary()">📔 Diary</div>
+</div>
+
+<!-- REMINDER -->
+<div id="reminderModal">
+  <div class="modal">
+    <h3>Add Reminder</h3>
+    <input id="reminderTitle">
+    <textarea id="reminderNote"></textarea>
+    <button class="btn secondary" onclick="closeReminder()">← Back</button>
+    <button class="btn primary" onclick="saveReminder()">Save</button>
+  </div>
+</div>
+
+<!-- DIARY -->
+<div id="panel">
+  <span class="back" onclick="closeDiary()">← Back</span>
+  <h3>Diary Entry</h3>
+  <input id="diaryTitle">
+  <textarea id="diaryText"></textarea>
+  <button class="btn primary" onclick="saveDiary()">Save</button>
+</div>
+
 <!-- TASK PANEL -->
 <div id="taskPanel">
   <span class="back" onclick="closeTasks()">← Back</span>
@@ -231,10 +293,118 @@ main{padding:24px;display:flex;justify-content:center}
 </div>
 
 <script>
+/* COLOR UTILS */
+const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6","#22c55e","#eab308"];
+const pick=(exclude=[])=>{
+  let c;
+  do{c=colors[Math.floor(Math.random()*colors.length)]}
+  while(exclude.includes(c));
+  return c;
+};
+
 /* STATE */
-let state=JSON.parse(localStorage.getItem("hh"))||{tasks:{}};
+let state=JSON.parse(localStorage.getItem("hh"))||{
+  name:"",
+  theme:"light",
+  accent:"#2563eb",
+  reminders:{},
+  diary:{},
+  tasks:{}
+};
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
+
+/* SETTINGS */
+function toggleSidebar(){sidebar.classList.toggle("open")}
+
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  state.theme=document.body.classList.contains("dark")?"dark":"light";
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+  save();
+}
+
+themePicker.oninput=e=>{
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  save();
+};
+
+nameInput.oninput=e=>{
+  state.name=e.target.value;
+  title.textContent=state.name||"Hodded Habits";
+  save();
+};
+
+/* INIT SETTINGS */
+(function(){
+  title.textContent=state.name||"Hodded Habits";
+  nameInput.value=state.name;
+  themePicker.value=state.accent;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  if(state.theme==="dark") document.body.classList.add("dark");
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+})();
+
+/* CALENDAR */
+const app=document.getElementById("app");
+const years=Array.from({length:27},(_,i)=>2026+i);
+const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let currentKey=null;
+
+function showYears(){
+  app.innerHTML=`<div class="grid years">${
+    years.map(y=>{
+      const yc=pick();
+      return `<div class="card" style="background:${yc}" onclick="showMonths(${y},'${yc}')">${y}</div>`;
+    }).join("")
+  }</div>`;
+}
+
+function showMonths(y,yc){
+  app.innerHTML=`
+    <div class="app-back" onclick="showYears()">← Back</div>
+    <div class="app-content">
+      <div class="grid months">${
+        months.map((m,i)=>{
+          const mc=pick([yc]);
+          const d=new Date(y,i+1,0).getDate();
+          return `
+          <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
+            ${m}
+            <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
+          </div>`;
+        }).join("")
+      }</div>
+    </div>`;
+}
+
+function showDays(y,m,yc,mc){
+  const days=new Date(y,m+1,0).getDate();
+  app.innerHTML=`
+    <div class="app-back" onclick="showMonths(${y},'${yc}')">← Back</div>
+    <div class="app-content">
+      <div class="grid days">${
+        Array.from({length:days},(_,d)=>{
+          const dc=pick([yc,mc]);
+          return `<div class="day" style="background:${dc}"
+            onclick="openTasks('${y}-${m}-${d+1}')"
+            oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`;
+        }).join("")
+      }</div>
+    </div>`;
+}
+
+showYears();
+
+/* CONTEXT */
+function openMenu(e,key){
+  e.preventDefault();e.stopPropagation();
+  currentKey=key;
+  contextMenu.style.display="block";
+  contextMenu.style.left=e.pageX+"px";
+  contextMenu.style.top=e.pageY+"px";
+}
+document.addEventListener("click",()=>contextMenu.style.display="none");
 
 /* TASKS */
 function openTasks(key){currentKey=key;taskPanel.classList.add("open");renderTasks()}
@@ -248,13 +418,28 @@ function renderTasks(){
   const list=state.tasks[currentKey]||[];
   taskList.innerHTML=list.map((t,i)=>`
     <div class="task">
-      <input type="text" value="${t.text}" oninput="editTask(${i},this.value)">
       <input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${i})">
-    </div>
-  `).join("");
+      <input value="${t.text}" oninput="editTask(${i},this.value)">
+    </div>`).join("");
 }
 function toggleTask(i){state.tasks[currentKey][i].done=!state.tasks[currentKey][i].done;save()}
 function editTask(i,val){state.tasks[currentKey][i].text=val;save()}
+
+/* REMINDER */
+function openReminder(){contextMenu.style.display="none";reminderModal.style.display="flex"}
+function closeReminder(){reminderModal.style.display="none"}
+function saveReminder(){
+  state.reminders[currentKey]={title:reminderTitle.value,note:reminderNote.value};
+  save();reminderModal.style.display="none";
+}
+
+/* DIARY */
+function openDiary(){contextMenu.style.display="none";panel.classList.add("open")}
+function closeDiary(){panel.classList.remove("open")}
+function saveDiary(){
+  state.diary[currentKey]={title:diaryTitle.value,text:diaryText.value};
+  save();panel.classList.remove("open");
+}
 </script>
 
 </body>
