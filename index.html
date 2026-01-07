@@ -50,29 +50,31 @@ header h1{margin-left:auto;font-size:18px}
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
-.toggle-wrap{
-  display:flex;justify-content:space-between;align-items:center;margin:14px 0
-}
-.toggle{
-  width:52px;height:26px;background:#cbd5e1;border-radius:999px;
-  position:relative;cursor:pointer
-}
-.toggle::after{
-  content:"";width:20px;height:20px;background:white;border-radius:50%;
-  position:absolute;top:3px;left:3px;transition:.3s
-}
-body.dark .toggle{background:var(--accent)}
-body.dark .toggle::after{transform:translateX(26px)}
-
-label{font-size:13px;display:block;margin-top:12px}
-input,textarea{
-  width:100%;padding:10px;border-radius:10px;
-  border:1px solid #ccc;margin-top:8px
-}
-
 /* MAIN */
 main{padding:24px;display:flex;justify-content:center}
-#app{width:100%;max-width:1100px}
+
+/* APP */
+#app{
+  width:100%;
+  max-width:1100px;
+  position:relative;
+}
+
+/* BACK (MONTHS & DAYS) */
+.app-back{
+  position:absolute;
+  top:0;
+  left:0;
+  cursor:pointer;
+  color:var(--accent);
+  font-weight:600;
+  z-index:5;
+}
+
+/* ✅ 4-LINE SPACE BELOW BACK */
+.app-content{
+  padding-top:96px; /* ≈ 4 text lines */
+}
 
 /* GRIDS */
 .grid{display:grid;gap:20px}
@@ -199,12 +201,6 @@ main{padding:24px;display:flex;justify-content:center}
   <h3>Settings</h3>
   <label>Name</label>
   <input id="nameInput">
-  <div class="toggle-wrap">
-    <span id="modeText">Dark Mode</span>
-    <div class="toggle" onclick="toggleTheme()"></div>
-  </div>
-  <label>Theme Color</label>
-  <input type="color" id="themePicker">
 </div>
 
 <header>
@@ -269,33 +265,16 @@ function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
-  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
   save();
 }
-themePicker.oninput=e=>{
-  state.accent=e.target.value;
-  document.documentElement.style.setProperty("--accent",state.accent);
-  save();
-};
 nameInput.oninput=e=>{
   state.name=e.target.value;
   title.textContent=state.name||"Hodded Habits";
   save();
 };
 
-(function(){
-  title.textContent=state.name||"Hodded Habits";
-  nameInput.value=state.name;
-  themePicker.value=state.accent;
-  document.documentElement.style.setProperty("--accent",state.accent);
-  if(state.theme==="dark") document.body.classList.add("dark");
-  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
-})();
-
 /* CALENDAR */
 const app=document.getElementById("app");
-
-/* 3 × 3 × 3 YEARS = 27 */
 const years=Array.from({length:27},(_,i)=>2026+i);
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let currentKey=null;
@@ -310,32 +289,39 @@ function showYears(){
 }
 
 function showMonths(y,yc){
-  app.innerHTML=`<span class="back" onclick="showYears()">← Back</span>
-  <div class="grid months">${
-    months.map((m,i)=>{
-      const mc=pick([yc]);
-      const d=new Date(y,i+1,0).getDate();
-      return `
-      <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
-        ${m}
-        <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
-      </div>`;
-    }).join("")
-  }</div>`;
+  app.innerHTML=`
+    <div class="app-back" onclick="showYears()">← Back</div>
+    <div class="app-content">
+      <div class="grid months">${
+        months.map((m,i)=>{
+          const mc=pick([yc]);
+          const d=new Date(y,i+1,0).getDate();
+          return `
+          <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
+            ${m}
+            <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
+          </div>`;
+        }).join("")
+      }</div>
+    </div>`;
 }
 
 function showDays(y,m,yc,mc){
   const days=new Date(y,m+1,0).getDate();
-  app.innerHTML=`<span class="back" onclick="showMonths(${y},'${yc}')">← Back</span>
-  <div class="grid days">${
-    Array.from({length:days},(_,d)=>{
-      const dc=pick([yc,mc]);
-      return `<div class="day" style="background:${dc}"
-        onclick="openTasks('${y}-${m}-${d+1}')"
-        oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`;
-    }).join("")
-  }</div>`;
+  app.innerHTML=`
+    <div class="app-back" onclick="showMonths(${y},'${yc}')">← Back</div>
+    <div class="app-content">
+      <div class="grid days">${
+        Array.from({length:days},(_,d)=>{
+          const dc=pick([yc,mc]);
+          return `<div class="day" style="background:${dc}"
+            onclick="openTasks('${y}-${m}-${d+1}')"
+            oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`;
+        }).join("")
+      }</div>
+    </div>`;
 }
+
 showYears();
 
 /* CONTEXT */
