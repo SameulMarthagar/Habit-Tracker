@@ -21,12 +21,64 @@ body.dark{
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
   background:var(--bg);
   color:var(--text);
+  overflow-x:hidden;
 }
 
-/* HEADER */
+/* ===== ONBOARDING PAGES ===== */
+.onboard{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,var(--accent),#1e293b);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .6s ease;
+  z-index:6000;
+}
+.onboard.hidden{
+  transform:translateX(-100%);
+}
+.onboard.next{
+  transform:translateX(100%);
+}
+
+.onboard-box{
+  width:90%;
+  max-width:720px;
+  text-align:center;
+}
+.onboard h1{
+  font-size:48px;
+  margin-bottom:12px;
+}
+.onboard p{
+  font-size:18px;
+  opacity:.9;
+}
+.onboard input{
+  margin-top:20px;
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  border-radius:14px;
+  border:none;
+}
+.onboard button{
+  margin-top:24px;
+  padding:14px 26px;
+  font-size:18px;
+  border:none;
+  border-radius:999px;
+  background:white;
+  color:#000;
+  cursor:pointer;
+}
+
+/* ===== HEADER ===== */
 header{
   height:60px;
   background:var(--card);
@@ -38,7 +90,7 @@ header{
 .menu{font-size:22px;cursor:pointer;margin-right:12px}
 header h1{margin-left:auto;font-size:18px}
 
-/* SETTINGS */
+/* ===== SETTINGS ===== */
 #sidebar{
   position:fixed;
   top:0;left:-300px;
@@ -51,11 +103,39 @@ header h1{margin-left:auto;font-size:18px}
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
-/* MAIN */
+.toggle-wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:14px 0;
+}
+.toggle{
+  width:52px;height:26px;
+  background:#cbd5e1;
+  border-radius:999px;
+  position:relative;
+  cursor:pointer;
+}
+.toggle::after{
+  content:"";
+  width:20px;height:20px;
+  background:white;
+  border-radius:50%;
+  position:absolute;
+  top:3px;left:3px;
+  transition:.3s;
+}
+body.dark .toggle{background:var(--accent)}
+body.dark .toggle::after{transform:translateX(26px)}
+
+label{font-size:13px;margin-top:12px;display:block}
+input{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:6px}
+
+/* ===== MAIN ===== */
 main{padding:24px;display:flex;justify-content:center}
 #app{width:100%;max-width:1100px}
 
-/* GRIDS */
+/* ===== GRIDS ===== */
 .grid{display:grid;gap:20px}
 .years{grid-template-columns:repeat(3,1fr)}
 .months{grid-template-columns:repeat(4,1fr)}
@@ -101,69 +181,50 @@ main{padding:24px;display:flex;justify-content:center}
   color:#000;
 }
 
-/* DAY PANEL */
-#panel{
-  position:fixed;
-  top:0;right:-420px;
-  width:420px;height:100%;
-  background:var(--card);
-  padding:18px;
-  transition:.3s;
-}
-#panel.open{right:0}
-
-/* WELCOME OVERLAY */
-.page{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:5000;
-}
-.hidden{display:none}
-.box{
-  background:var(--card);
-  padding:32px;
-  border-radius:18px;
-  width:90%;
-  max-width:420px;
-  text-align:center;
-}
-.box button{
-  width:100%;
-  padding:12px;
-  margin-top:16px;
-  border:none;
-  border-radius:12px;
-  background:var(--accent);
-  color:white;
-}
+/* RANDOM COLORS */
+constColors:root;
 </style>
 </head>
 
 <body>
 
-<!-- WELCOME STEP 1 -->
-<div id="welcome1" class="page">
-  <div class="box">
+<!-- ONBOARD STEP 1 -->
+<div id="welcomePage" class="onboard">
+  <div class="onboard-box">
     <h1>Welcome to Hodded Habits</h1>
     <p id="quote"></p>
-    <button onclick="goNext()">Next</button>
+    <button onclick="toName()">Next →</button>
   </div>
 </div>
 
-<!-- WELCOME STEP 2 -->
-<div id="welcome2" class="page hidden">
-  <div class="box">
+<!-- ONBOARD STEP 2 -->
+<div id="namePage" class="onboard next">
+  <div class="onboard-box">
     <h1>Your Name</h1>
     <input id="welcomeName" placeholder="Enter your name">
-    <button onclick="startApp()">Start My Year</button>
+    <button onclick="finishOnboard()">Start My Year →</button>
   </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="sidebar">
+  <div class="back" onclick="toggleSidebar()">← Back</div>
+  <h3>Settings</h3>
+
+  <label>Name</label>
+  <input id="nameInput">
+
+  <div class="toggle-wrap">
+    <span id="modeText">Dark Mode</span>
+    <div class="toggle" onclick="toggleTheme()"></div>
+  </div>
+
+  <label>Theme Color</label>
+  <input type="color" id="colorPicker">
 </div>
 
 <header>
+  <span class="menu" onclick="toggleSidebar()">☰</span>
   <h1 id="title">Hodded Habits</h1>
 </header>
 
@@ -176,22 +237,66 @@ main{padding:24px;display:flex;justify-content:center}
 const quotes=[
   "Small habits create big change.",
   "Consistency beats motivation.",
-  "One day at a time.",
-  "Progress over perfection."
+  "Your future is built daily.",
+  "One habit can change everything."
 ];
 quote.textContent=quotes[Math.floor(Math.random()*quotes.length)];
+
+/* STATE */
+let state=JSON.parse(localStorage.getItem("hh"))||{
+  name:"",
+  theme:"light",
+  accent:"#2563eb",
+  started:false
+};
+const save=()=>localStorage.setItem("hh",JSON.stringify(state));
+
+/* ONBOARD FLOW */
+function toName(){
+  welcomePage.classList.add("hidden");
+  namePage.classList.remove("next");
+}
+function finishOnboard(){
+  if(!welcomeName.value.trim())return;
+  state.name=welcomeName.value.trim();
+  state.started=true;
+  save();
+  welcomePage.style.display="none";
+  namePage.style.display="none";
+  initApp();
+}
+
+/* SETTINGS */
+function toggleSidebar(){sidebar.classList.toggle("open")}
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  state.theme=document.body.classList.contains("dark")?"dark":"light";
+  updateModeText();save();
+}
+function updateModeText(){
+  modeText.textContent=document.body.classList.contains("dark")?"Light Mode":"Dark Mode";
+}
+nameInput.oninput=e=>{
+  state.name=e.target.value;
+  title.textContent=state.name;
+  save();
+};
+colorPicker.oninput=e=>{
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",e.target.value);
+  save();
+};
 
 /* RANDOM COLORS */
 const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"][Math.floor(Math.random()*7)];
 const light=()=>["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"][Math.floor(Math.random()*6)];
 
-/* CALENDAR DATA */
+/* CALENDAR */
 const app=document.getElementById("app");
 const years=[2026,2027,2028,2029,2030,2031,2032,2033,2034];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let current={};
 
-/* ALWAYS RENDER YEARS */
 function showYears(){
   app.innerHTML=`<div class="grid years">${years.map(y=>`
     <div class="card" style="background:${rand()}" onclick="showMonths(${y})">${y}</div>
@@ -202,8 +307,7 @@ function showMonths(y){
   app.innerHTML=`<div class="back-link" onclick="showYears()">← Back</div>
   <div class="grid months">${months.map((m,i)=>`
     <div class="card" style="background:${rand()}" onclick="showDays(${i})">
-      ${m}
-      <div class="mini">${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}</div>
+      ${m}<div class="mini">${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}</div>
     </div>
   `).join("")}</div>`;
 }
@@ -217,22 +321,17 @@ function showDays(m){
   `).join("")}</div>`;
 }
 
-/* WELCOME FLOW */
-function goNext(){
-  welcome1.classList.add("hidden");
-  welcome2.classList.remove("hidden");
-}
-function startApp(){
-  const name=welcomeName.value.trim();
-  if(name){
-    title.textContent=name;
-  }
-  welcome1.style.display="none";
-  welcome2.style.display="none";
+function initApp(){
+  title.textContent=state.name||"Hodded Habits";
+  showYears();
 }
 
 /* START */
-showYears();
+if(state.started){
+  welcomePage.style.display="none";
+  namePage.style.display="none";
+  initApp();
+}
 </script>
 
 </body>
