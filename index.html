@@ -38,31 +38,29 @@ header{
 .menu{font-size:22px;cursor:pointer;margin-right:12px}
 header h1{margin-left:auto;font-size:18px}
 
-/* SETTINGS */
-#sidebar{
-  position:fixed;top:0;left:-300px;
-  width:300px;height:100%;
-  background:var(--card);
-  padding:16px;
-  transition:.3s;
-  z-index:4000;
-}
-#sidebar.open{left:0}
-
-/* BACK */
-.back{
-  cursor:pointer;
-  color:var(--accent);
-}
-
-/* ✅ REAL SPACE = 4 LINES */
-.spacer{
-  height:64px;
-}
-
 /* MAIN */
 main{padding:24px;display:flex;justify-content:center}
-#app{width:100%;max-width:1100px}
+#app{
+  width:100%;
+  max-width:1100px;
+  position:relative; /* REQUIRED */
+}
+
+/* BACK BUTTON — LEFT CORNER */
+.back{
+  position:absolute;
+  top:0;
+  left:0;
+  cursor:pointer;
+  color:var(--accent);
+  font-weight:600;
+  z-index:10;
+}
+
+/* PUSH CONTENT DOWN */
+.content{
+  padding-top:64px;
+}
 
 /* GRIDS */
 .grid{display:grid;gap:20px}
@@ -109,52 +107,63 @@ main{padding:24px;display:flex;justify-content:center}
 <body>
 
 <header>
+  <span class="menu">☰</span>
   <h1>Hodded Habits</h1>
 </header>
 
-<main><div id="app"></div></main>
+<main>
+  <div id="app"></div>
+</main>
 
 <script>
+/* COLORS */
 const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
 const pick=()=>colors[Math.floor(Math.random()*colors.length)];
 
+/* DATA */
 const app=document.getElementById("app");
 const years=Array.from({length:27},(_,i)=>2026+i);
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 
+/* VIEWS */
 function showYears(){
-  app.innerHTML=`<div class="grid years">${years.map(y=>`
-    <div class="card" style="background:${pick()}" onclick="showMonths(${y})">${y}</div>
-  `).join("")}</div>`;
+  app.innerHTML=`
+    <div class="grid years">
+      ${years.map(y=>`
+        <div class="card" style="background:${pick()}" onclick="showMonths(${y})">${y}</div>
+      `).join("")}
+    </div>`;
 }
 
 function showMonths(y){
   app.innerHTML=`
-    <span class="back" onclick="showYears()">← Back</span>
-    <div class="spacer"></div>
-    <div class="grid months">
-      ${months.map((m,i)=>{
-        const d=new Date(y,i+1,0).getDate();
-        return `
-        <div class="card" style="background:${pick()}" onclick="showDays(${y},${i})">
-          ${m}
-          <div class="mini">
-            ${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}
-          </div>
-        </div>`;
-      }).join("")}
+    <div class="back" onclick="showYears()">← Back</div>
+    <div class="content">
+      <div class="grid months">
+        ${months.map((m,i)=>{
+          const d=new Date(y,i+1,0).getDate();
+          return `
+          <div class="card" style="background:${pick()}" onclick="showDays(${y},${i})">
+            ${m}
+            <div class="mini">
+              ${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
     </div>`;
 }
 
 function showDays(y,m){
   const days=new Date(y,m+1,0).getDate();
   app.innerHTML=`
-    <span class="back" onclick="showMonths(${y})">← Back</span>
-    <div class="spacer"></div>
-    <div class="grid days">
-      ${Array.from({length:days},(_,d)=>`
-        <div class="day" style="background:${pick()}">${d+1}</div>
-      `).join("")}
+    <div class="back" onclick="showMonths(${y})">← Back</div>
+    <div class="content">
+      <div class="grid days">
+        ${Array.from({length:days},(_,d)=>`
+          <div class="day" style="background:${pick()}">${d+1}</div>
+        `).join("")}
+      </div>
     </div>`;
 }
 
