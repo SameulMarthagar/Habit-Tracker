@@ -23,6 +23,7 @@ body{
   font-family:system-ui;
   background:var(--bg);
   color:var(--text);
+  overflow-x:hidden;
 }
 
 /* HEADER */
@@ -48,29 +49,20 @@ header h1{margin-left:auto;font-size:18px}
 }
 #sidebar.open{left:0}
 
-/* MAIN */
-main{padding:24px;display:flex;justify-content:center}
-#app{
-  width:100%;
-  max-width:1100px;
-  position:relative;
-}
-
-/* BACK BUTTON — LEFT CORNER */
+/* BACK */
 .back{
-  position:absolute;
-  top:0;
-  left:0;
   cursor:pointer;
   color:var(--accent);
-  font-weight:600;
-  z-index:5;
 }
 
-/* CONTENT OFFSET */
-.content{
-  padding-top:64px;
+/* ✅ REAL SPACE = 4 LINES */
+.spacer{
+  height:64px;
 }
+
+/* MAIN */
+main{padding:24px;display:flex;justify-content:center}
+#app{width:100%;max-width:1100px}
 
 /* GRIDS */
 .grid{display:grid;gap:20px}
@@ -111,134 +103,16 @@ main{padding:24px;display:flex;justify-content:center}
   background:rgba(0,0,0,.25);
   color:white
 }
-
-/* CONTEXT MENU */
-#contextMenu{
-  position:absolute;
-  background:var(--card);
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,.3);
-  display:none;
-  z-index:9000
-}
-.context-item{
-  padding:12px 16px;
-  cursor:pointer
-}
-.context-item:hover{background:var(--accent);color:white}
-
-/* REMINDER */
-#reminderModal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9500
-}
-.modal{
-  background:var(--card);
-  padding:24px;
-  border-radius:20px;
-  width:90%;
-  max-width:440px
-}
-
-/* DIARY PANEL */
-#panel{
-  position:fixed;
-  top:0;
-  left:-440px;
-  width:440px;
-  height:100%;
-  padding:18px;
-  background:var(--card);
-  transition:.3s;
-  z-index:3000
-}
-#panel.open{left:0}
-
-/* TASK PANEL */
-#taskPanel{
-  position:fixed;
-  top:0;
-  right:-360px;
-  width:360px;
-  height:100%;
-  background:var(--card);
-  padding:18px;
-  transition:.3s;
-  z-index:3500
-}
-#taskPanel.open{right:0}
-
-.task{
-  display:flex;
-  gap:10px;
-  margin-top:10px
-}
-.btn{
-  margin-top:12px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer
-}
-.btn.primary{background:var(--accent);color:white}
-.btn.secondary{background:#cbd5e1}
 </style>
 </head>
 
 <body>
 
-<!-- SETTINGS -->
-<div id="sidebar">
-  <div class="back" onclick="toggleSidebar()">← Back</div>
-  <h3>Settings</h3>
-  <label>Name</label>
-  <input id="nameInput">
-</div>
-
 <header>
-  <span class="menu" onclick="toggleSidebar()">☰</span>
-  <h1 id="title">Hodded Habits</h1>
+  <h1>Hodded Habits</h1>
 </header>
 
 <main><div id="app"></div></main>
-
-<!-- CONTEXT MENU -->
-<div id="contextMenu" onclick="event.stopPropagation()">
-  <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
-  <div class="context-item" onclick="openDiary()">📔 Diary</div>
-</div>
-
-<!-- REMINDER -->
-<div id="reminderModal">
-  <div class="modal">
-    <h3>Add Reminder</h3>
-    <input id="reminderTitle">
-    <textarea id="reminderNote"></textarea>
-    <button class="btn secondary" onclick="closeReminder()">← Back</button>
-    <button class="btn primary" onclick="saveReminder()">Save</button>
-  </div>
-</div>
-
-<!-- DIARY -->
-<div id="panel">
-  <span class="back" onclick="closeDiary()">← Back</span>
-  <h3>Diary Entry</h3>
-  <input id="diaryTitle">
-  <textarea id="diaryText"></textarea>
-  <button class="btn primary" onclick="saveDiary()">Save</button>
-</div>
-
-<!-- TASK PANEL -->
-<div id="taskPanel">
-  <span class="back" onclick="closeTasks()">← Back</span>
-  <h3>Daily Tasks</h3>
-  <div id="taskList"></div>
-  <button class="btn primary" onclick="addTask()">+ Add Task</button>
-</div>
 
 <script>
 const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
@@ -247,7 +121,6 @@ const pick=()=>colors[Math.floor(Math.random()*colors.length)];
 const app=document.getElementById("app");
 const years=Array.from({length:27},(_,i)=>2026+i);
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-let currentKey=null;
 
 function showYears(){
   app.innerHTML=`<div class="grid years">${years.map(y=>`
@@ -257,70 +130,35 @@ function showYears(){
 
 function showMonths(y){
   app.innerHTML=`
-    <div class="back" onclick="showYears()">← Back</div>
-    <div class="content">
-      <div class="grid months">${months.map((m,i)=>{
+    <span class="back" onclick="showYears()">← Back</span>
+    <div class="spacer"></div>
+    <div class="grid months">
+      ${months.map((m,i)=>{
         const d=new Date(y,i+1,0).getDate();
         return `
         <div class="card" style="background:${pick()}" onclick="showDays(${y},${i})">
           ${m}
-          <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
+          <div class="mini">
+            ${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}
+          </div>
         </div>`;
-      }).join("")}</div>
+      }).join("")}
     </div>`;
 }
 
 function showDays(y,m){
   const days=new Date(y,m+1,0).getDate();
   app.innerHTML=`
-    <div class="back" onclick="showMonths(${y})">← Back</div>
-    <div class="content">
-      <div class="grid days">${Array.from({length:days},(_,d)=>`
-        <div class="day" style="background:${pick()}"
-          onclick="openTasks('${y}-${m}-${d+1}')"
-          oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>
-      `).join("")}</div>
+    <span class="back" onclick="showMonths(${y})">← Back</span>
+    <div class="spacer"></div>
+    <div class="grid days">
+      ${Array.from({length:days},(_,d)=>`
+        <div class="day" style="background:${pick()}">${d+1}</div>
+      `).join("")}
     </div>`;
 }
 
 showYears();
-
-/* CONTEXT */
-function openMenu(e,key){
-  e.preventDefault();e.stopPropagation();
-  currentKey=key;
-  contextMenu.style.display="block";
-  contextMenu.style.left=e.pageX+"px";
-  contextMenu.style.top=e.pageY+"px";
-}
-document.addEventListener("click",()=>contextMenu.style.display="none");
-
-/* TASKS */
-function openTasks(key){currentKey=key;taskPanel.classList.add("open");renderTasks()}
-function closeTasks(){taskPanel.classList.remove("open")}
-function addTask(){
-  state.tasks[currentKey]=state.tasks[currentKey]||[];
-  state.tasks[currentKey].push({text:"",done:false});
-  save();renderTasks();
-}
-function renderTasks(){
-  const list=state.tasks[currentKey]||[];
-  taskList.innerHTML=list.map((t,i)=>`
-    <div class="task">
-      <input type="checkbox" ${t.done?"checked":""}>
-      <input value="${t.text}">
-    </div>`).join("");
-}
-
-/* REMINDER */
-function openReminder(){contextMenu.style.display="none";reminderModal.style.display="flex"}
-function closeReminder(){reminderModal.style.display="none"}
-function saveReminder(){reminderModal.style.display="none"}
-
-/* DIARY */
-function openDiary(){contextMenu.style.display="none";panel.classList.add("open")}
-function closeDiary(){panel.classList.remove("open")}
-function saveDiary(){panel.classList.remove("open")}
 </script>
 
 </body>
