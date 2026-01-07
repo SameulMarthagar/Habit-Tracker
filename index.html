@@ -205,7 +205,7 @@ main{padding:24px;display:flex;justify-content:center}
 <main><div id="app"></div></main>
 
 <!-- CONTEXT MENU -->
-<div id="contextMenu">
+<div id="contextMenu" onclick="event.stopPropagation()">
   <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
   <div class="context-item" onclick="openDiary()">📔 Diary</div>
 </div>
@@ -326,15 +326,20 @@ function showDays(y,m){
       oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`).join("")}</div>`;
 }
 
-/* CONTEXT MENU */
+/* CONTEXT MENU FIX */
 function openMenu(e,key){
   e.preventDefault();
+  e.stopPropagation();
   currentKey=key;
   contextMenu.style.display="block";
   contextMenu.style.left=e.pageX+"px";
   contextMenu.style.top=e.pageY+"px";
 }
-document.addEventListener("click",()=>contextMenu.style.display="none");
+document.addEventListener("click",(e)=>{
+  if(!contextMenu.contains(e.target)){
+    contextMenu.style.display="none";
+  }
+});
 
 /* REMINDER */
 function openReminder(){
