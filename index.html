@@ -50,6 +50,44 @@ header h1{margin-left:auto;font-size:18px}
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
+.toggle-wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:14px 0
+}
+.toggle{
+  width:52px;height:26px;
+  background:#cbd5e1;
+  border-radius:999px;
+  position:relative;
+  cursor:pointer
+}
+.toggle::after{
+  content:"";
+  width:20px;height:20px;
+  background:white;
+  border-radius:50%;
+  position:absolute;
+  top:3px;left:3px;
+  transition:.3s
+}
+body.dark .toggle{background:var(--accent)}
+body.dark .toggle::after{transform:translateX(26px)}
+
+label{
+  font-size:13px;
+  display:block;
+  margin-top:12px
+}
+input,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:8px
+}
+
 /* MAIN */
 main{padding:24px;display:flex;justify-content:center}
 
@@ -71,9 +109,9 @@ main{padding:24px;display:flex;justify-content:center}
   z-index:5;
 }
 
-/* ✅ 4-LINE SPACE BELOW BACK */
+/* 4-LINE SPACE */
 .app-content{
-  padding-top:96px; /* ≈ 4 text lines */
+  padding-top:96px;
 }
 
 /* GRIDS */
@@ -196,11 +234,21 @@ main{padding:24px;display:flex;justify-content:center}
 
 <body>
 
+<!-- SETTINGS -->
 <div id="sidebar">
   <div class="back" onclick="toggleSidebar()">← Back</div>
   <h3>Settings</h3>
+
   <label>Name</label>
   <input id="nameInput">
+
+  <div class="toggle-wrap">
+    <span id="modeText">Dark Mode</span>
+    <div class="toggle" onclick="toggleTheme()"></div>
+  </div>
+
+  <label>Theme Color</label>
+  <input type="color" id="themePicker">
 </div>
 
 <header>
@@ -210,11 +258,13 @@ main{padding:24px;display:flex;justify-content:center}
 
 <main><div id="app"></div></main>
 
+<!-- CONTEXT MENU -->
 <div id="contextMenu" onclick="event.stopPropagation()">
   <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
   <div class="context-item" onclick="openDiary()">📔 Diary</div>
 </div>
 
+<!-- REMINDER -->
 <div id="reminderModal">
   <div class="modal">
     <h3>Add Reminder</h3>
@@ -225,6 +275,7 @@ main{padding:24px;display:flex;justify-content:center}
   </div>
 </div>
 
+<!-- DIARY -->
 <div id="panel">
   <span class="back" onclick="closeDiary()">← Back</span>
   <h3>Diary Entry</h3>
@@ -233,6 +284,7 @@ main{padding:24px;display:flex;justify-content:center}
   <button class="btn primary" onclick="saveDiary()">Save</button>
 </div>
 
+<!-- TASK PANEL -->
 <div id="taskPanel">
   <span class="back" onclick="closeTasks()">← Back</span>
   <h3>Daily Tasks</h3>
@@ -261,17 +313,37 @@ let state=JSON.parse(localStorage.getItem("hh"))||{
 };
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
 
+/* SETTINGS */
 function toggleSidebar(){sidebar.classList.toggle("open")}
+
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
   save();
 }
+
+themePicker.oninput=e=>{
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  save();
+};
+
 nameInput.oninput=e=>{
   state.name=e.target.value;
   title.textContent=state.name||"Hodded Habits";
   save();
 };
+
+/* INIT SETTINGS */
+(function(){
+  title.textContent=state.name||"Hodded Habits";
+  nameInput.value=state.name;
+  themePicker.value=state.accent;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  if(state.theme==="dark") document.body.classList.add("dark");
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+})();
 
 /* CALENDAR */
 const app=document.getElementById("app");
