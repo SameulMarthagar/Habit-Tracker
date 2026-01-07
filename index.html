@@ -87,7 +87,8 @@ main{padding:24px;display:flex;justify-content:center}
 }
 .day{
   border-radius:12px;padding:18px 0;text-align:center;
-  font-size:18px;cursor:pointer;color:#000
+  font-size:18px;cursor:pointer;color:#000;
+  background:#e5e7eb
 }
 
 /* CONTEXT MENU */
@@ -101,9 +102,7 @@ main{padding:24px;display:flex;justify-content:center}
 }
 .context-item{
   padding:12px 16px;
-  cursor:pointer;
-  display:flex;
-  gap:10px
+  cursor:pointer
 }
 .context-item:hover{background:var(--accent);color:white}
 
@@ -132,6 +131,7 @@ main{padding:24px;display:flex;justify-content:center}
   width:440px;
   height:100%;
   padding:18px;
+  background:var(--card);
   transition:.3s;
   z-index:3000
 }
@@ -195,7 +195,7 @@ main{padding:24px;display:flex;justify-content:center}
 
 <main><div id="app"></div></main>
 
-<!-- CONTEXT MENU -->
+<!-- CONTEXT MENU (RIGHT CLICK ONLY) -->
 <div id="contextMenu" onclick="event.stopPropagation()">
   <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
   <div class="context-item" onclick="openDiary()">📔 Diary</div>
@@ -229,8 +229,8 @@ main{padding:24px;display:flex;justify-content:center}
 </div>
 
 <script>
-/* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{
+  name:"",
   theme:"light",
   accent:"#2563eb",
   reminders:{},
@@ -252,16 +252,21 @@ themePicker.oninput=e=>{
   document.documentElement.style.setProperty("--accent",e.target.value);
   save();
 };
+nameInput.oninput=e=>{
+  state.name=e.target.value;
+  title.textContent=state.name||"Hodded Habits";
+  save();
+};
 
 /* CALENDAR */
 const app=document.getElementById("app");
-const years=[2026,2027,2028,2029];
+const years=[2026,2027,2028,2029,2030];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let currentKey=null;
 
 function showYears(){
   app.innerHTML=`<div class="grid years">${years.map(y=>`
-    <div class="card" style="background:#3b82f6" onclick="showMonths(${y})">${y}</div>
+    <div class="card" style="background:var(--accent)" onclick="showMonths(${y})">${y}</div>
   `).join("")}</div>`;
 }
 function showMonths(y){
@@ -276,12 +281,14 @@ function showDays(y,m){
   <div class="grid days">${Array.from({length:days},(_,d)=>`
     <div class="day"
       onclick="openTasks('${y}-${m}-${d+1}')"
-      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>
+      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">
+      ${d+1}
+    </div>
   `).join("")}</div>`;
 }
 showYears();
 
-/* RIGHT CLICK */
+/* RIGHT CLICK MENU */
 function openMenu(e,key){
   e.preventDefault();
   e.stopPropagation();
