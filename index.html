@@ -40,8 +40,7 @@ header h1{margin-left:auto;font-size:18px}
 
 /* SETTINGS */
 #sidebar{
-  position:fixed;
-  top:0;left:-300px;
+  position:fixed;top:0;left:-300px;
   width:300px;height:100%;
   background:var(--card);
   padding:16px;
@@ -67,8 +66,8 @@ body.dark .toggle::after{transform:translateX(26px)}
 
 label{font-size:13px;display:block;margin-top:12px}
 input,textarea{
-  width:100%;padding:8px;border-radius:8px;
-  border:1px solid #ccc;margin-top:6px
+  width:100%;padding:10px;border-radius:10px;
+  border:1px solid #ccc;margin-top:8px
 }
 
 /* MAIN */
@@ -124,20 +123,20 @@ main{padding:24px;display:flex;justify-content:center}
   display:none;align-items:center;justify-content:center;z-index:9500
 }
 .modal{
-  background:var(--card);padding:24px;border-radius:18px;
-  width:90%;max-width:420px
+  background:var(--card);padding:24px;border-radius:20px;
+  width:90%;max-width:440px
 }
-.modal-actions{display:flex;gap:10px;margin-top:16px}
+.modal-actions{display:flex;gap:10px;margin-top:18px}
 
 /* DIARY PANEL */
 #panel{
-  position:fixed;top:0;right:-420px;width:420px;height:100%;
-  padding:16px;transition:.3s;z-index:3000
+  position:fixed;top:0;right:-440px;width:440px;height:100%;
+  padding:18px;transition:.3s;z-index:3000
 }
 #panel.open{right:0}
 
 .btn{
-  padding:12px;border:none;border-radius:12px;
+  padding:12px;border:none;border-radius:14px;
   cursor:pointer;font-size:15px
 }
 .btn.primary{background:var(--accent);color:white}
@@ -215,7 +214,8 @@ main{padding:24px;display:flex;justify-content:center}
 <div id="reminderModal">
   <div class="modal">
     <h3>Add Reminder 🔔</h3>
-    <input id="reminderText">
+    <input id="reminderTitle" placeholder="Reminder title">
+    <textarea id="reminderNote" placeholder="Notes (optional)"></textarea>
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeReminder()">Back</button>
       <button class="btn primary" onclick="saveReminder()">Save</button>
@@ -227,7 +227,8 @@ main{padding:24px;display:flex;justify-content:center}
 <div id="panel">
   <span class="back-link" onclick="closeDiary()">← Back</span>
   <h3>Diary Entry 📔</h3>
-  <textarea id="diaryText"></textarea>
+  <input id="diaryTitle" placeholder="Diary title">
+  <textarea id="diaryText" placeholder="Write your thoughts..."></textarea>
   <button class="btn primary" onclick="saveDiary()">Save Entry</button>
 </div>
 
@@ -337,7 +338,9 @@ document.addEventListener("click",()=>contextMenu.style.display="none");
 
 /* REMINDER */
 function openReminder(){
-  reminderText.value=state.reminders[currentKey]||"";
+  const r=state.reminders[currentKey]||{};
+  reminderTitle.value=r.title||"";
+  reminderNote.value=r.note||"";
   reminderModal.style.display="flex";
 }
 function closeReminder(){
@@ -345,14 +348,19 @@ function closeReminder(){
 }
 function saveReminder(){
   if(!currentKey) return;
-  state.reminders[currentKey]=reminderText.value;
+  state.reminders[currentKey]={
+    title:reminderTitle.value,
+    note:reminderNote.value
+  };
   saveState();
   reminderModal.style.display="none";
 }
 
 /* DIARY */
 function openDiary(){
-  diaryText.value=state.diary[currentKey]||"";
+  const d=state.diary[currentKey]||{};
+  diaryTitle.value=d.title||"";
+  diaryText.value=d.text||"";
   panel.style.background=`linear-gradient(135deg,${rand()},${rand()})`;
   panel.classList.add("open");
 }
@@ -361,7 +369,10 @@ function closeDiary(){
 }
 function saveDiary(){
   if(!currentKey) return;
-  state.diary[currentKey]=diaryText.value;
+  state.diary[currentKey]={
+    title:diaryTitle.value,
+    text:diaryText.value
+  };
   saveState();
   panel.classList.remove("open");
 }
