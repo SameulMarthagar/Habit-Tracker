@@ -7,67 +7,67 @@
 
 <style>
 :root{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#0f172a;
-  --accent:#2563eb;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+  --accent:#2563eb;
 }
 body.dark{
-  --bg:#0f172a;
-  --card:#020617;
-  --text:#e5e7eb;
+  --bg:#0f172a;
+  --card:#020617;
+  --text:#e5e7eb;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;
-  font-family:system-ui;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
 }
 
 /* HEADER */
 header{
-  height:60px;
-  background:var(--card);
-  display:flex;
-  align-items:center;
-  padding:0 16px;
-  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  height:60px;
+  background:var(--card);
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
 .menu{font-size:22px;cursor:pointer;margin-right:12px}
 header h1{margin-left:auto;font-size:18px}
 
 /* SETTINGS */
 #sidebar{
-  position:fixed;top:0;left:-300px;
-  width:300px;height:100%;
-  background:var(--card);
-  padding:16px;
-  transition:.3s;
-  z-index:4000;
+  position:fixed;top:0;left:-300px;
+  width:300px;height:100%;
+  background:var(--card);
+  padding:16px;
+  transition:.3s;
+  z-index:4000;
 }
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
 .toggle-wrap{
-  display:flex;justify-content:space-between;align-items:center;margin:14px 0
+  display:flex;justify-content:space-between;align-items:center;margin:14px 0
 }
 .toggle{
-  width:52px;height:26px;background:#cbd5e1;border-radius:999px;
-  position:relative;cursor:pointer
+  width:52px;height:26px;background:#cbd5e1;border-radius:999px;
+  position:relative;cursor:pointer
 }
 .toggle::after{
-  content:"";width:20px;height:20px;background:white;border-radius:50%;
-  position:absolute;top:3px;left:3px;transition:.3s
+  content:"";width:20px;height:20px;background:white;border-radius:50%;
+  position:absolute;top:3px;left:3px;transition:.3s
 }
 body.dark .toggle{background:var(--accent)}
 body.dark .toggle::after{transform:translateX(26px)}
 
 label{font-size:13px;display:block;margin-top:12px}
 input,textarea{
-  width:100%;padding:10px;border-radius:10px;
-  border:1px solid #ccc;margin-top:8px
+  width:100%;padding:10px;border-radius:10px;
+  border:1px solid #ccc;margin-top:8px
 }
 
 /* MAIN */
@@ -81,111 +81,111 @@ main{padding:24px;display:flex;justify-content:center}
 .days{grid-template-columns:repeat(7,1fr)}
 
 .card{
-  border-radius:18px;
-  padding:22px;
-  text-align:center;
-  box-shadow:0 6px 16px rgba(0,0,0,.12);
-  cursor:pointer;
-  font-size:20px;
-  font-weight:600;
-  color:white
+  border-radius:18px;
+  padding:22px;
+  text-align:center;
+  box-shadow:0 6px 16px rgba(0,0,0,.12);
+  cursor:pointer;
+  font-size:20px;
+  font-weight:600;
+  color:white
 }
 .day{
-  border-radius:12px;
-  padding:18px 0;
-  text-align:center;
-  font-size:18px;
-  cursor:pointer;
-  color:#000
+  border-radius:12px;
+  padding:18px 0;
+  text-align:center;
+  font-size:18px;
+  cursor:pointer;
+  color:#000
 }
 
 /* MINI DAYS IN MONTH */
 .mini{
-  margin-top:12px;
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px
 }
 .mini div{
-  font-size:11px;
-  padding:5px 0;
-  border-radius:6px;
-  background:rgba(0,0,0,.25);
-  color:white
+  font-size:11px;
+  padding:5px 0;
+  border-radius:6px;
+  background:rgba(0,0,0,.25);
+  color:white
 }
 
 /* CONTEXT MENU */
 #contextMenu{
-  position:absolute;
-  background:var(--card);
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,.3);
-  display:none;
-  z-index:9000
+  position:absolute;
+  background:var(--card);
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,.3);
+  display:none;
+  z-index:9000
 }
 .context-item{
-  padding:12px 16px;
-  cursor:pointer
+  padding:12px 16px;
+  cursor:pointer
 }
 .context-item:hover{background:var(--accent);color:white}
 
 /* REMINDER MODAL */
 #reminderModal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9500
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9500
 }
 .modal{
-  background:var(--card);
-  padding:24px;
-  border-radius:20px;
-  width:90%;
-  max-width:440px
+  background:var(--card);
+  padding:24px;
+  border-radius:20px;
+  width:90%;
+  max-width:440px
 }
 
 /* DIARY PANEL */
 #panel{
-  position:fixed;
-  top:0;
-  left:-440px;
-  width:440px;
-  height:100%;
-  padding:18px;
-  background:var(--card);
-  transition:.3s;
-  z-index:3000
+  position:fixed;
+  top:0;
+  left:-440px;
+  width:440px;
+  height:100%;
+  padding:18px;
+  background:var(--card);
+  transition:.3s;
+  z-index:3000
 }
 #panel.open{left:0}
 
 /* TASK PANEL */
 #taskPanel{
-  position:fixed;
-  top:0;
-  right:-360px;
-  width:360px;
-  height:100%;
-  background:var(--card);
-  padding:18px;
-  transition:.3s;
-  z-index:3500
+  position:fixed;
+  top:0;
+  right:-360px;
+  width:360px;
+  height:100%;
+  background:var(--card);
+  padding:18px;
+  transition:.3s;
+  z-index:3500
 }
 #taskPanel.open{right:0}
 
 .task{
-  display:flex;
-  gap:10px;
-  margin-top:10px
+  display:flex;
+  gap:10px;
+  margin-top:10px
 }
 
 .btn{
-  margin-top:12px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer
+  margin-top:12px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer
 }
 .btn.primary{background:var(--accent);color:white}
 .btn.secondary{background:#cbd5e1}
@@ -196,60 +196,60 @@ main{padding:24px;display:flex;justify-content:center}
 
 <!-- SETTINGS -->
 <div id="sidebar">
-  <div class="back" onclick="toggleSidebar()">← Back</div>
-  <h3>Settings</h3>
+  <div class="back" onclick="toggleSidebar()">← Back</div>
+  <h3>Settings</h3>
 
-  <label>Name</label>
-  <input id="nameInput">
+  <label>Name</label>
+  <input id="nameInput">
 
-  <div class="toggle-wrap">
-    <span id="modeText">Dark Mode</span>
-    <div class="toggle" onclick="toggleTheme()"></div>
-  </div>
+  <div class="toggle-wrap">
+    <span id="modeText">Dark Mode</span>
+    <div class="toggle" onclick="toggleTheme()"></div>
+  </div>
 
-  <label>Theme Color</label>
-  <input type="color" id="themePicker">
+  <label>Theme Color</label>
+  <input type="color" id="themePicker">
 </div>
 
 <header>
-  <span class="menu" onclick="toggleSidebar()">☰</span>
-  <h1 id="title">Hodded Habits</h1>
+  <span class="menu" onclick="toggleSidebar()">☰</span>
+  <h1 id="title">Hodded Habits</h1>
 </header>
 
 <main><div id="app"></div></main>
 
 <!-- CONTEXT MENU -->
 <div id="contextMenu" onclick="event.stopPropagation()">
-  <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
-  <div class="context-item" onclick="openDiary()">📔 Diary</div>
+  <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
+  <div class="context-item" onclick="openDiary()">📔 Diary</div>
 </div>
 
 <!-- REMINDER -->
 <div id="reminderModal">
-  <div class="modal">
-    <h3>Add Reminder</h3>
-    <input id="reminderTitle">
-    <textarea id="reminderNote"></textarea>
-    <button class="btn secondary" onclick="closeReminder()">← Back</button>
-    <button class="btn primary" onclick="saveReminder()">Save</button>
-  </div>
+  <div class="modal">
+    <h3>Add Reminder</h3>
+    <input id="reminderTitle">
+    <textarea id="reminderNote"></textarea>
+    <button class="btn secondary" onclick="closeReminder()">← Back</button>
+    <button class="btn primary" onclick="saveReminder()">Save</button>
+  </div>
 </div>
 
 <!-- DIARY -->
 <div id="panel">
-  <span class="back" onclick="closeDiary()">← Back</span>
-  <h3>Diary Entry</h3>
-  <input id="diaryTitle">
-  <textarea id="diaryText"></textarea>
-  <button class="btn primary" onclick="saveDiary()">Save</button>
+  <span class="back" onclick="closeDiary()">← Back</span>
+  <h3>Diary Entry</h3>
+  <input id="diaryTitle">
+  <textarea id="diaryText"></textarea>
+  <button class="btn primary" onclick="saveDiary()">Save</button>
 </div>
 
 <!-- TASK PANEL -->
 <div id="taskPanel">
-  <span class="back" onclick="closeTasks()">← Back</span>
-  <h3>Daily Tasks</h3>
-  <div id="taskList"></div>
-  <button class="btn primary" onclick="addTask()">+ Add Task</button>
+  <span class="back" onclick="closeTasks()">← Back</span>
+  <h3>Daily Tasks</h3>
+  <div id="taskList"></div>
+  <button class="btn primary" onclick="addTask()">+ Add Task</button>
 </div>
 
 <script>
@@ -259,42 +259,42 @@ const light=()=>["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"][Ma
 
 /* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{
-  name:"",
-  theme:"light",
-  accent:"#2563eb",
-  reminders:{},
-  diary:{},
-  tasks:{}
+  name:"",
+  theme:"light",
+  accent:"#2563eb",
+  reminders:{},
+  diary:{},
+  tasks:{}
 };
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
 
 /* SETTINGS */
 function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleTheme(){
-  document.body.classList.toggle("dark");
-  state.theme=document.body.classList.contains("dark")?"dark":"light";
-  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
-  save();
+  document.body.classList.toggle("dark");
+  state.theme=document.body.classList.contains("dark")?"dark":"light";
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+  save();
 }
 themePicker.oninput=e=>{
-  state.accent=e.target.value;
-  document.documentElement.style.setProperty("--accent",state.accent);
-  save();
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  save();
 };
 nameInput.oninput=e=>{
-  state.name=e.target.value;
-  title.textContent=state.name||"Hodded Habits";
-  save();
+  state.name=e.target.value;
+  title.textContent=state.name||"Hodded Habits";
+  save();
 };
 
 /* INIT SETTINGS */
 (function(){
-  title.textContent=state.name||"Hodded Habits";
-  nameInput.value=state.name;
-  themePicker.value=state.accent;
-  document.documentElement.style.setProperty("--accent",state.accent);
-  if(state.theme==="dark") document.body.classList.add("dark");
-  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+  title.textContent=state.name||"Hodded Habits";
+  nameInput.value=state.name;
+  themePicker.value=state.accent;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  if(state.theme==="dark") document.body.classList.add("dark");
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
 })();
 
 /* CALENDAR */
@@ -304,39 +304,39 @@ const months=["January","February","March","April","May","June","July","August",
 let currentKey=null;
 
 function showYears(){
-  app.innerHTML=`<div class="grid years">${years.map(y=>`
-    <div class="card" style="background:${rand()}" onclick="showMonths(${y})">${y}</div>
-  `).join("")}</div>`;
+  app.innerHTML=`<div class="grid years">${years.map(y=>`
+    <div class="card" style="background:${rand()}" onclick="showMonths(${y})">${y}</div>
+  `).join("")}</div>`;
 }
 function showMonths(y){
-  app.innerHTML=`<span class="back" onclick="showYears()">← Back</span>
-  <div class="grid months">${months.map((m,i)=>{
-    const d=new Date(y,i+1,0).getDate();
-    return `
-    <div class="card" style="background:${rand()}" onclick="showDays(${y},${i})">
-      ${m}
-      <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
-    </div>`;
-  }).join("")}</div>`;
+  app.innerHTML=`<span class="back" onclick="showYears()">← Back</span>
+  <div class="grid months">${months.map((m,i)=>{
+    const d=new Date(y,i+1,0).getDate();
+    return `
+    <div class="card" style="background:${rand()}" onclick="showDays(${y},${i})">
+      ${m}
+      <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
+    </div>`;
+  }).join("")}</div>`;
 }
 function showDays(y,m){
-  const days=new Date(y,m+1,0).getDate();
-  app.innerHTML=`<span class="back" onclick="showMonths(${y})">← Back</span>
-  <div class="grid days">${Array.from({length:days},(_,d)=>`
-    <div class="day" style="background:${light()}"
-      onclick="openTasks('${y}-${m}-${d+1}')"
-      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>
-  `).join("")}</div>`;
+  const days=new Date(y,m+1,0).getDate();
+  app.innerHTML=`<span class="back" onclick="showMonths(${y})">← Back</span>
+  <div class="grid days">${Array.from({length:days},(_,d)=>`
+    <div class="day" style="background:${light()}"
+      onclick="openTasks('${y}-${m}-${d+1}')"
+      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>
+  `).join("")}</div>`;
 }
 showYears();
 
 /* RIGHT CLICK */
 function openMenu(e,key){
-  e.preventDefault();e.stopPropagation();
-  currentKey=key;
-  contextMenu.style.display="block";
-  contextMenu.style.left=e.pageX+"px";
-  contextMenu.style.top=e.pageY+"px";
+  e.preventDefault();e.stopPropagation();
+  currentKey=key;
+  contextMenu.style.display="block";
+  contextMenu.style.left=e.pageX+"px";
+  contextMenu.style.top=e.pageY+"px";
 }
 document.addEventListener("click",()=>contextMenu.style.display="none");
 
@@ -344,17 +344,17 @@ document.addEventListener("click",()=>contextMenu.style.display="none");
 function openTasks(key){currentKey=key;taskPanel.classList.add("open");renderTasks()}
 function closeTasks(){taskPanel.classList.remove("open")}
 function addTask(){
-  state.tasks[currentKey]=state.tasks[currentKey]||[];
-  state.tasks[currentKey].push({text:"",done:false});
-  save();renderTasks();
+  state.tasks[currentKey]=state.tasks[currentKey]||[];
+  state.tasks[currentKey].push({text:"",done:false});
+  save();renderTasks();
 }
 function renderTasks(){
-  const list=state.tasks[currentKey]||[];
-  taskList.innerHTML=list.map((t,i)=>`
-    <div class="task">
-      <input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${i})">
-      <input value="${t.text}" oninput="editTask(${i},this.value)">
-    </div>`).join("");
+  const list=state.tasks[currentKey]||[];
+  taskList.innerHTML=list.map((t,i)=>`
+    <div class="task">
+      <input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${i})">
+      <input value="${t.text}" oninput="editTask(${i},this.value)">
+    </div>`).join("");
 }
 function toggleTask(i){state.tasks[currentKey][i].done=!state.tasks[currentKey][i].done;save()}
 function editTask(i,val){state.tasks[currentKey][i].text=val;save()}
@@ -363,16 +363,16 @@ function editTask(i,val){state.tasks[currentKey][i].text=val;save()}
 function openReminder(){contextMenu.style.display="none";reminderModal.style.display="flex"}
 function closeReminder(){reminderModal.style.display="none"}
 function saveReminder(){
-  state.reminders[currentKey]={title:reminderTitle.value,note:reminderNote.value};
-  save();reminderModal.style.display="none";
+  state.reminders[currentKey]={title:reminderTitle.value,note:reminderNote.value};
+  save();reminderModal.style.display="none";
 }
 
 /* DIARY */
 function openDiary(){contextMenu.style.display="none";panel.classList.add("open")}
 function closeDiary(){panel.classList.remove("open")}
 function saveDiary(){
-  state.diary[currentKey]={title:diaryTitle.value,text:diaryText.value};
-  save();panel.classList.remove("open");
+  state.diary[currentKey]={title:diaryTitle.value,text:diaryText.value};
+  save();panel.classList.remove("open");
 }
 </script>
 
