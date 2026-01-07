@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ===== THEME (GLOBAL – SETTINGS CONTROLLED) ===== */
+/* ===== THEME ===== */
 :root{
   --bg:#f8fafc;
   --card:#ffffff;
@@ -26,7 +26,6 @@ body{
   font-family:system-ui;
   background:var(--bg);
   color:var(--text);
-  transition:.3s;
 }
 
 /* ===== HEADER ===== */
@@ -42,7 +41,7 @@ header{
 header img{height:34px}
 header h1{margin-left:auto;font-size:18px}
 
-/* ===== SETTINGS SIDEBAR ===== */
+/* ===== SETTINGS ===== */
 #sidebar{
   position:fixed;
   top:0;left:-300px;
@@ -56,7 +55,6 @@ header h1{margin-left:auto;font-size:18px}
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
-/* Toggle */
 .toggle-wrap{
   display:flex;
   justify-content:space-between;
@@ -95,7 +93,6 @@ main{padding:24px;display:flex;justify-content:center}
 .months{grid-template-columns:repeat(4,1fr)}
 .days{grid-template-columns:repeat(7,1fr)}
 
-/* ===== CARDS ===== */
 .card{
   border-radius:18px;
   padding:28px 20px;
@@ -107,7 +104,7 @@ main{padding:24px;display:flex;justify-content:center}
   color:white;
 }
 
-/* ===== MINI CALENDAR ===== */
+/* MINI CALENDAR */
 .mini{
   display:grid;
   grid-template-columns:repeat(7,1fr);
@@ -122,7 +119,7 @@ main{padding:24px;display:flex;justify-content:center}
   color:#000;
 }
 
-/* ===== BACK LINKS ===== */
+/* BACK */
 .back-link{
   font-size:16px;
   color:var(--accent);
@@ -130,7 +127,7 @@ main{padding:24px;display:flex;justify-content:center}
   margin-bottom:20px;
 }
 
-/* ===== MONTH VIEW ===== */
+/* MONTH */
 .month-header{
   text-align:center;
   font-size:26px;
@@ -146,7 +143,7 @@ main{padding:24px;display:flex;justify-content:center}
   color:#000;
 }
 
-/* ===== DAY PANEL ===== */
+/* DAY PANEL */
 #panel{
   position:fixed;
   top:0;right:-420px;
@@ -158,15 +155,54 @@ main{padding:24px;display:flex;justify-content:center}
 }
 #panel.open{right:0}
 .task{display:flex;gap:8px;margin-bottom:6px}
-.progress{
-  height:10px;background:#e5e7eb;
-  border-radius:999px;overflow:hidden;margin-bottom:12px
-}
+.progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-bottom:12px}
 .progress div{height:100%;background:var(--accent)}
+
+/* ===== WELCOME MODAL ===== */
+#welcome{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5000;
+}
+.welcome-box{
+  background:var(--card);
+  padding:28px;
+  border-radius:18px;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+.welcome-box h2{margin-bottom:6px}
+.welcome-box p{opacity:.8}
+.welcome-box button{
+  margin-top:14px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="welcome-box">
+    <h2>Welcome to Hodded Habits</h2>
+    <p id="quote"></p>
+    <input id="welcomeName" placeholder="Enter your name">
+    <button onclick="startApp()">Start My Year</button>
+  </div>
+</div>
 
 <!-- SETTINGS -->
 <div id="sidebar">
@@ -207,23 +243,51 @@ main{padding:24px;display:flex;justify-content:center}
 </div>
 
 <script>
+/* ===== MOTIVATION ===== */
+const quotes=[
+  "Small habits done daily create massive change.",
+  "Consistency beats motivation every time.",
+  "Your future is built one day at a time.",
+  "Show up today. That’s enough.",
+  "Progress, not perfection.",
+  "Discipline is choosing what you want most.",
+  "One good habit can change your whole year."
+];
+quote.textContent=quotes[Math.floor(Math.random()*quotes.length)];
+
 /* ===== STATE ===== */
 let state=JSON.parse(localStorage.getItem("hh"))||{
-  name:"Hodded Habits",
+  name:"",
   theme:"light",
   accent:"#2563eb",
-  data:{}
+  data:{},
+  started:false
 };
 function save(){localStorage.setItem("hh",JSON.stringify(state))}
 
-/* ===== APPLY SETTINGS ===== */
-title.textContent=state.name;
-nameInput.value=state.name;
-document.documentElement.style.setProperty("--accent",state.accent);
-colorPicker.value=state.accent;
-if(state.theme==="dark")document.body.classList.add("dark");
-updateModeText();
+/* START APP */
+function startApp(){
+  if(welcomeName.value.trim()){
+    state.name=welcomeName.value.trim();
+    state.started=true;
+    save();
+    init();
+  }
+}
 
+/* INIT */
+function init(){
+  welcome.style.display=state.started?"none":"flex";
+  title.textContent=state.name||"Hodded Habits";
+  nameInput.value=state.name;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  colorPicker.value=state.accent;
+  if(state.theme==="dark")document.body.classList.add("dark");
+  updateModeText();
+  showYears();
+}
+
+/* SETTINGS */
 function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleTheme(){
   document.body.classList.toggle("dark");
@@ -234,8 +298,9 @@ function updateModeText(){
   modeText.textContent=document.body.classList.contains("dark")?"Light Mode":"Dark Mode";
 }
 nameInput.oninput=e=>{
-  state.name=e.target.value||"Hodded Habits";
-  title.textContent=state.name;save();
+  state.name=e.target.value;
+  title.textContent=state.name;
+  save();
 };
 colorPicker.oninput=e=>{
   state.accent=e.target.value;
@@ -243,17 +308,11 @@ colorPicker.oninput=e=>{
   save();
 };
 
-/* ===== RANDOM COLOR (UI ONLY) ===== */
-function randColor(){
-  const c=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"];
-  return c[Math.floor(Math.random()*c.length)];
-}
-function lightRand(){
-  const c=["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"];
-  return c[Math.floor(Math.random()*c.length)];
-}
+/* RANDOM COLORS */
+const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"][Math.floor(Math.random()*7)];
+const light=()=>["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"][Math.floor(Math.random()*6)];
 
-/* ===== CALENDAR ===== */
+/* CALENDAR */
 const app=document.getElementById("app");
 const years=[2026,2027,2028,2029,2030,2031,2032,2033,2034];
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -261,44 +320,26 @@ let current={year:null,month:null,day:null};
 let chart=null;
 
 function showYears(){
-  app.innerHTML=`
-    <div class="grid years">
-      ${years.map(y=>`
-        <div class="card" style="background:${randColor()}" onclick="showMonths(${y})">${y}</div>
-      `).join("")}
-    </div>`;
+  app.innerHTML=`<div class="grid years">${years.map(y=>`<div class="card" style="background:${rand()}" onclick="showMonths(${y})">${y}</div>`).join("")}</div>`;
 }
-
 function showMonths(y){
   current.year=y;
-  app.innerHTML=`
-    <div class="back-link" onclick="showYears()">← Back to Years</div>
-    <div class="grid months">
-      ${months.map((m,i)=>`
-        <div class="card" style="background:${randColor()}" onclick="showDays(${i})">
-          ${m}
-          <div class="mini">
-            ${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}
-          </div>
-        </div>
-      `).join("")}
-    </div>`;
+  app.innerHTML=`<div class="back-link" onclick="showYears()">← Back to Years</div><div class="grid months">${months.map((m,i)=>`
+    <div class="card" style="background:${rand()}" onclick="showDays(${i})">
+      ${m}
+      <div class="mini">${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}</div>
+    </div>`).join("")}</div>`;
 }
-
 function showDays(m){
   current.month=m;
   const days=new Date(current.year,m+1,0).getDate();
-  app.innerHTML=`
-    <div class="back-link" onclick="showMonths(${current.year})">← Back to Months</div>
+  app.innerHTML=`<div class="back-link" onclick="showMonths(${current.year})">← Back to Months</div>
     <div class="month-header">${months[m]} ${current.year}</div>
-    <div class="grid days">
-      ${Array.from({length:days},(_,d)=>`
-        <div class="day" style="background:${lightRand()}" onclick="openDay(${d+1})">${d+1}</div>
-      `).join("")}
-    </div>`;
+    <div class="grid days">${Array.from({length:days},(_,d)=>`
+      <div class="day" style="background:${light()}" onclick="openDay(${d+1})">${d+1}</div>`).join("")}</div>`;
 }
 
-/* ===== DAY PANEL ===== */
+/* DAY PANEL */
 function openDay(d){
   current.day=d;
   panel.classList.add("open");
@@ -307,7 +348,6 @@ function openDay(d){
   renderTasks(key);
 }
 function closePanel(){panel.classList.remove("open")}
-
 function addTask(){
   const key=`${current.year}-${current.month}-${current.day}`;
   if(!taskInput.value)return;
@@ -326,28 +366,20 @@ function renderTasks(key){
   tasks.innerHTML="";
   list.forEach((x,i)=>{
     if(x.d)done++;
-    tasks.innerHTML+=`
-      <div class="task">
-        <input type="checkbox" ${x.d?"checked":""} onchange="toggleTask('${key}',${i})">
-        ${x.t}
-      </div>`;
+    tasks.innerHTML+=`<div class="task">
+      <input type="checkbox" ${x.d?"checked":""} onchange="toggleTask('${key}',${i})"> ${x.t}
+    </div>`;
   });
   bar.style.width=list.length?(done/list.length*100)+"%":"0%";
   if(chart)chart.destroy();
   chart=new Chart(pie,{
     type:"pie",
-    data:{
-      labels:["Done","Left"],
-      datasets:[{
-        data:[done,list.length-done],
-        backgroundColor:[state.accent,"#cbd5e1"]
-      }]
-    },
+    data:{labels:["Done","Left"],datasets:[{data:[done,list.length-done],backgroundColor:[state.accent,"#cbd5e1"]}]},
     options:{plugins:{legend:{position:"bottom"}}}
   });
 }
 
-showYears();
+init();
 </script>
 
 </body>
