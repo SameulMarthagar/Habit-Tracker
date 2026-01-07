@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+u remvoed it is small code is smmall use this whole code and then add in thsi and upadte it bro <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -50,21 +50,43 @@ header h1{margin-left:auto;font-size:18px}
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
-/* MONTH ANALYTICS PANEL */
-#monthPanel{
-  position:fixed;
-  top:0;
-  left:-360px;
-  width:360px;
-  height:100%;
-  background:var(--card);
-  padding:18px;
-  transition:.3s;
-  z-index:3600;
-  overflow:auto;
+.toggle-wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:14px 0
 }
-#monthPanel.open{left:0}
-#monthPanel canvas{display:block;margin:20px auto}
+.toggle{
+  width:52px;height:26px;
+  background:#cbd5e1;
+  border-radius:999px;
+  position:relative;
+  cursor:pointer
+}
+.toggle::after{
+  content:"";
+  width:20px;height:20px;
+  background:white;
+  border-radius:50%;
+  position:absolute;
+  top:3px;left:3px;
+  transition:.3s
+}
+body.dark .toggle{background:var(--accent)}
+body.dark .toggle::after{transform:translateX(26px)}
+
+label{
+  font-size:13px;
+  display:block;
+  margin-top:12px
+}
+input,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:8px
+}
 
 /* MAIN */
 main{padding:24px;display:flex;justify-content:center}
@@ -76,7 +98,7 @@ main{padding:24px;display:flex;justify-content:center}
   position:relative;
 }
 
-/* BACK */
+/* BACK (MONTHS & DAYS) */
 .app-back{
   position:absolute;
   top:0;
@@ -86,7 +108,11 @@ main{padding:24px;display:flex;justify-content:center}
   font-weight:600;
   z-index:5;
 }
-.app-content{padding-top:96px}
+
+/* 4-LINE SPACE */
+.app-content{
+  padding-top:96px;
+}
 
 /* GRIDS */
 .grid{display:grid;gap:20px}
@@ -137,26 +163,69 @@ main{padding:24px;display:flex;justify-content:center}
   display:none;
   z-index:9000
 }
-.context-item{padding:12px 16px;cursor:pointer}
+.context-item{
+  padding:12px 16px;
+  cursor:pointer
+}
 .context-item:hover{background:var(--accent);color:white}
 
-/* PANELS */
+/* REMINDER MODAL */
+#reminderModal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9500
+}
+.modal{
+  background:var(--card);
+  padding:24px;
+  border-radius:20px;
+  width:90%;
+  max-width:440px
+}
+
+/* DIARY PANEL */
 #panel{
-  position:fixed;top:0;left:-440px;width:440px;height:100%;
-  padding:18px;background:var(--card);transition:.3s;z-index:3000
+  position:fixed;
+  top:0;
+  left:-440px;
+  width:440px;
+  height:100%;
+  padding:18px;
+  background:var(--card);
+  transition:.3s;
+  z-index:3000
 }
 #panel.open{left:0}
 
+/* TASK PANEL */
 #taskPanel{
-  position:fixed;top:0;right:-360px;width:360px;height:100%;
-  background:var(--card);padding:18px;transition:.3s;z-index:3500
+  position:fixed;
+  top:0;
+  right:-360px;
+  width:360px;
+  height:100%;
+  background:var(--card);
+  padding:18px;
+  transition:.3s;
+  z-index:3500
 }
 #taskPanel.open{right:0}
 
-.task{display:flex;gap:10px;margin-top:10px}
+.task{
+  display:flex;
+  gap:10px;
+  margin-top:10px
+}
 
 .btn{
-  margin-top:12px;padding:10px;border:none;border-radius:10px;cursor:pointer
+  margin-top:12px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer
 }
 .btn.primary{background:var(--accent);color:white}
 .btn.secondary{background:#cbd5e1}
@@ -169,8 +238,17 @@ main{padding:24px;display:flex;justify-content:center}
 <div id="sidebar">
   <div class="back" onclick="toggleSidebar()">← Back</div>
   <h3>Settings</h3>
+
   <label>Name</label>
   <input id="nameInput">
+
+  <div class="toggle-wrap">
+    <span id="modeText">Dark Mode</span>
+    <div class="toggle" onclick="toggleTheme()"></div>
+  </div>
+
+  <label>Theme Color</label>
+  <input type="color" id="themePicker">
 </div>
 
 <header>
@@ -180,29 +258,92 @@ main{padding:24px;display:flex;justify-content:center}
 
 <main><div id="app"></div></main>
 
-<!-- MONTH ANALYTICS -->
-<div id="monthPanel">
-  <span class="back" onclick="closeMonthStats()">← Back</span>
-  <h3 id="monthTitle"></h3>
-  <p id="monthSummary"></p>
-  <canvas id="monthPie" width="260" height="260"></canvas>
-  <canvas id="monthBar" width="300" height="180"></canvas>
+<!-- CONTEXT MENU -->
+<div id="contextMenu" onclick="event.stopPropagation()">
+  <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
+  <div class="context-item" onclick="openDiary()">📔 Diary</div>
+</div>
+
+<!-- REMINDER -->
+<div id="reminderModal">
+  <div class="modal">
+    <h3>Add Reminder</h3>
+    <input id="reminderTitle">
+    <textarea id="reminderNote"></textarea>
+    <button class="btn secondary" onclick="closeReminder()">← Back</button>
+    <button class="btn primary" onclick="saveReminder()">Save</button>
+  </div>
+</div>
+
+<!-- DIARY -->
+<div id="panel">
+  <span class="back" onclick="closeDiary()">← Back</span>
+  <h3>Diary Entry</h3>
+  <input id="diaryTitle">
+  <textarea id="diaryText"></textarea>
+  <button class="btn primary" onclick="saveDiary()">Save</button>
+</div>
+
+<!-- TASK PANEL -->
+<div id="taskPanel">
+  <span class="back" onclick="closeTasks()">← Back</span>
+  <h3>Daily Tasks</h3>
+  <div id="taskList"></div>
+  <button class="btn primary" onclick="addTask()">+ Add Task</button>
 </div>
 
 <script>
 /* COLOR UTILS */
 const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6","#22c55e","#eab308"];
 const pick=(exclude=[])=>{
-  let c;do{c=colors[Math.floor(Math.random()*colors.length)]}
-  while(exclude.includes(c));return c;
+  let c;
+  do{c=colors[Math.floor(Math.random()*colors.length)]}
+  while(exclude.includes(c));
+  return c;
 };
 
 /* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{
-  name:"",theme:"light",accent:"#2563eb",
-  reminders:{},diary:{},tasks:{}
+  name:"",
+  theme:"light",
+  accent:"#2563eb",
+  reminders:{},
+  diary:{},
+  tasks:{}
 };
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
+
+/* SETTINGS */
+function toggleSidebar(){sidebar.classList.toggle("open")}
+
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  state.theme=document.body.classList.contains("dark")?"dark":"light";
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+  save();
+}
+
+themePicker.oninput=e=>{
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  save();
+};
+
+nameInput.oninput=e=>{
+  state.name=e.target.value;
+  title.textContent=state.name||"Hodded Habits";
+  save();
+};
+
+/* INIT SETTINGS */
+(function(){
+  title.textContent=state.name||"Hodded Habits";
+  nameInput.value=state.name;
+  themePicker.value=state.accent;
+  document.documentElement.style.setProperty("--accent",state.accent);
+  if(state.theme==="dark") document.body.classList.add("dark");
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+})();
 
 /* CALENDAR */
 const app=document.getElementById("app");
@@ -228,9 +369,7 @@ function showMonths(y,yc){
           const mc=pick([yc]);
           const d=new Date(y,i+1,0).getDate();
           return `
-          <div class="card" style="background:${mc}"
-            onclick="showDays(${y},${i},'${yc}','${mc}')"
-            oncontextmenu="openMonthStats(event,${y},${i})">
+          <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
             ${m}
             <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
           </div>`;
@@ -248,7 +387,8 @@ function showDays(y,m,yc,mc){
         Array.from({length:days},(_,d)=>{
           const dc=pick([yc,mc]);
           return `<div class="day" style="background:${dc}"
-            onclick="openTasks('${y}-${m}-${d+1}')">${d+1}</div>`;
+            onclick="openTasks('${y}-${m}-${d+1}')"
+            oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`;
         }).join("")
       }</div>
     </div>`;
@@ -256,64 +396,51 @@ function showDays(y,m,yc,mc){
 
 showYears();
 
+/* CONTEXT */
+function openMenu(e,key){
+  e.preventDefault();e.stopPropagation();
+  currentKey=key;
+  contextMenu.style.display="block";
+  contextMenu.style.left=e.pageX+"px";
+  contextMenu.style.top=e.pageY+"px";
+}
+document.addEventListener("click",()=>contextMenu.style.display="none");
+
 /* TASKS */
-function openTasks(k){
-  currentKey=k;
-  state.tasks[k]=state.tasks[k]||[];
+function openTasks(key){currentKey=key;taskPanel.classList.add("open");renderTasks()}
+function closeTasks(){taskPanel.classList.remove("open")}
+function addTask(){
+  state.tasks[currentKey]=state.tasks[currentKey]||[];
+  state.tasks[currentKey].push({text:"",done:false});
+  save();renderTasks();
+}
+function renderTasks(){
+  const list=state.tasks[currentKey]||[];
+  taskList.innerHTML=list.map((t,i)=>`
+    <div class="task">
+      <input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${i})">
+      <input value="${t.text}" oninput="editTask(${i},this.value)">
+    </div>`).join("");
+}
+function toggleTask(i){state.tasks[currentKey][i].done=!state.tasks[currentKey][i].done;save()}
+function editTask(i,val){state.tasks[currentKey][i].text=val;save()}
+
+/* REMINDER */
+function openReminder(){contextMenu.style.display="none";reminderModal.style.display="flex"}
+function closeReminder(){reminderModal.style.display="none"}
+function saveReminder(){
+  state.reminders[currentKey]={title:reminderTitle.value,note:reminderNote.value};
+  save();reminderModal.style.display="none";
 }
 
-/* MONTH ANALYTICS */
-function openMonthStats(e,y,m){
-  e.preventDefault();
-  monthPanel.classList.add("open");
-
-  let total=0,done=0;
-  const daily={};
-
-  Object.keys(state.tasks).forEach(k=>{
-    const [yy,mm,dd]=k.split("-").map(Number);
-    if(yy===y && mm===m){
-      state.tasks[k].forEach(t=>{
-        total++; if(t.done) done++;
-      });
-      daily[dd]=(daily[dd]||0)+state.tasks[k].filter(t=>t.done).length;
-    }
-  });
-
-  const percent=total?Math.round(done/total*100):0;
-  monthTitle.textContent=`${months[m]} ${y}`;
-  monthSummary.textContent=`Completed ${done} of ${total} tasks (${percent}%)`;
-
-  drawPie(done,total-done);
-  drawBar(daily);
-}
-
-function closeMonthStats(){monthPanel.classList.remove("open")}
-
-function drawPie(done,pending){
-  const c=monthPie.getContext("2d");
-  c.clearRect(0,0,260,260);
-  const total=done+pending||1;
-  const a=done/total*Math.PI*2;
-  c.fillStyle="#22c55e";
-  c.beginPath();c.moveTo(130,130);c.arc(130,130,120,0,a);c.fill();
-  c.fillStyle="#ef4444";
-  c.beginPath();c.moveTo(130,130);c.arc(130,130,120,a,Math.PI*2);c.fill();
-}
-
-function drawBar(data){
-  const c=monthBar.getContext("2d");
-  c.clearRect(0,0,300,180);
-  const days=Object.keys(data);
-  const max=Math.max(...Object.values(data),1);
-  const w=260/(days.length||1);
-  days.forEach((d,i)=>{
-    const h=data[d]/max*140;
-    c.fillStyle="var(--accent)";
-    c.fillRect(20+i*w,160-h,w-4,h);
-  });
+/* DIARY */
+function openDiary(){contextMenu.style.display="none";panel.classList.add("open")}
+function closeDiary(){panel.classList.remove("open")}
+function saveDiary(){
+  state.diary[currentKey]={title:diaryTitle.value,text:diaryText.value};
+  save();panel.classList.remove("open");
 }
 </script>
 
 </body>
-</html>
+</html>  
