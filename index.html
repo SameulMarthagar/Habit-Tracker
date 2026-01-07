@@ -50,44 +50,6 @@ header h1{margin-left:auto;font-size:18px}
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
-.toggle-wrap{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:14px 0
-}
-.toggle{
-  width:52px;height:26px;
-  background:#cbd5e1;
-  border-radius:999px;
-  position:relative;
-  cursor:pointer
-}
-.toggle::after{
-  content:"";
-  width:20px;height:20px;
-  background:white;
-  border-radius:50%;
-  position:absolute;
-  top:3px;left:3px;
-  transition:.3s
-}
-body.dark .toggle{background:var(--accent)}
-body.dark .toggle::after{transform:translateX(26px)}
-
-label{
-  font-size:13px;
-  display:block;
-  margin-top:12px
-}
-input,textarea{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  margin-top:8px
-}
-
 /* MAIN */
 main{padding:24px;display:flex;justify-content:center}
 
@@ -96,62 +58,6 @@ main{padding:24px;display:flex;justify-content:center}
   width:100%;
   max-width:1100px;
   position:relative;
-}
-
-/* BACK (MONTHS & DAYS) */
-.app-back{
-  position:absolute;
-  top:0;
-  left:0;
-  cursor:pointer;
-  color:var(--accent);
-  font-weight:600;
-  z-index:5;
-}
-
-/* 4-LINE SPACE */
-.app-content{
-  padding-top:96px;
-}
-
-/* GRIDS */
-.grid{display:grid;gap:20px}
-.years{grid-template-columns:repeat(3,1fr)}
-.months{grid-template-columns:repeat(3,1fr)}
-.days{grid-template-columns:repeat(7,1fr)}
-
-.card{
-  border-radius:18px;
-  padding:22px;
-  text-align:center;
-  box-shadow:0 6px 16px rgba(0,0,0,.12);
-  cursor:pointer;
-  font-size:20px;
-  font-weight:600;
-  color:white
-}
-.day{
-  border-radius:12px;
-  padding:18px 0;
-  text-align:center;
-  font-size:18px;
-  cursor:pointer;
-  color:#000
-}
-
-/* MINI DAYS */
-.mini{
-  margin-top:12px;
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px
-}
-.mini div{
-  font-size:11px;
-  padding:5px 0;
-  border-radius:6px;
-  background:rgba(0,0,0,.25);
-  color:white
 }
 
 /* TASK PANEL */
@@ -168,7 +74,7 @@ main{padding:24px;display:flex;justify-content:center}
 }
 #taskPanel.open{right:0}
 
-/* ✅ UPDATED TASK LAYOUT (ONLY ADDITION) */
+/* ✅ TASK ROW — NAME FIRST, TICK LAST */
 .task{
   display:flex;
   align-items:center;
@@ -179,6 +85,7 @@ main{padding:24px;display:flex;justify-content:center}
   flex:1;
 }
 .task input[type="checkbox"]{
+  margin-left:auto;
   width:20px;
   height:20px;
 }
@@ -192,37 +99,15 @@ main{padding:24px;display:flex;justify-content:center}
   cursor:pointer
 }
 .btn.primary{background:var(--accent);color:white}
-.btn.secondary{background:#cbd5e1}
 </style>
 </head>
 
 <body>
 
-<!-- SETTINGS -->
-<div id="sidebar">
-  <div class="back" onclick="toggleSidebar()">← Back</div>
-  <h3>Settings</h3>
-
-  <label>Name</label>
-  <input id="nameInput">
-
-  <div class="toggle-wrap">
-    <span id="modeText">Dark Mode</span>
-    <div class="toggle" onclick="toggleTheme()"></div>
-  </div>
-
-  <label>Theme Color</label>
-  <input type="color" id="themePicker">
-</div>
-
 <header>
-  <span class="menu" onclick="toggleSidebar()">☰</span>
-  <h1 id="title">Hodded Habits</h1>
+  <h1>Hodded Habits</h1>
 </header>
 
-<main><div id="app"></div></main>
-
-<!-- TASK PANEL -->
 <div id="taskPanel">
   <span class="back" onclick="closeTasks()">← Back</span>
   <h3>Daily Tasks</h3>
@@ -231,30 +116,37 @@ main{padding:24px;display:flex;justify-content:center}
 </div>
 
 <script>
-/* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{tasks:{}};
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
-let currentKey=null;
+let currentKey="today";
 
-/* TASKS */
 function openTasks(key){currentKey=key;taskPanel.classList.add("open");renderTasks()}
 function closeTasks(){taskPanel.classList.remove("open")}
+
 function addTask(){
   state.tasks[currentKey]=state.tasks[currentKey]||[];
   state.tasks[currentKey].push({text:"",done:false});
   save();renderTasks();
 }
+
 function renderTasks(){
   const list=state.tasks[currentKey]||[];
   taskList.innerHTML=list.map((t,i)=>`
     <div class="task">
-      <input type="text" value="${t.text}" oninput="editTask(${i},this.value)">
+      <input value="${t.text}" oninput="editTask(${i},this.value)">
       <input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${i})">
     </div>
   `).join("");
 }
-function toggleTask(i){state.tasks[currentKey][i].done=!state.tasks[currentKey][i].done;save()}
-function editTask(i,val){state.tasks[currentKey][i].text=val;save()}
+
+function toggleTask(i){
+  state.tasks[currentKey][i].done=!state.tasks[currentKey][i].done;
+  save();
+}
+function editTask(i,val){
+  state.tasks[currentKey][i].text=val;
+  save();
+}
 </script>
 
 </body>
