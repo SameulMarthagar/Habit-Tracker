@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -98,7 +98,7 @@ main{padding:24px;display:flex;justify-content:center}
   position:relative;
 }
 
-/* BACK (MONTHS & DAYS) */
+/* BACK */
 .app-back{
   position:absolute;
   top:0;
@@ -109,10 +109,8 @@ main{padding:24px;display:flex;justify-content:center}
   z-index:5;
 }
 
-/* 4-LINE SPACE */
-.app-content{
-  padding-top:96px;
-}
+/* CONTENT SPACE */
+.app-content{padding-top:96px}
 
 /* GRIDS */
 .grid{display:grid;gap:20px}
@@ -229,6 +227,22 @@ main{padding:24px;display:flex;justify-content:center}
 }
 .btn.primary{background:var(--accent);color:white}
 .btn.secondary{background:#cbd5e1}
+
+/* ✅ MONTH SUMMARY PANEL (ADDED ONLY) */
+#monthPanel{
+  position:fixed;
+  top:0;
+  left:-360px;
+  width:360px;
+  height:100%;
+  background:var(--card);
+  padding:18px;
+  transition:.3s;
+  z-index:3600;
+  overflow:auto;
+}
+#monthPanel.open{left:0}
+#monthPanel canvas{display:block;margin:20px auto}
 </style>
 </head>
 
@@ -292,6 +306,15 @@ main{padding:24px;display:flex;justify-content:center}
   <button class="btn primary" onclick="addTask()">+ Add Task</button>
 </div>
 
+<!-- ✅ MONTH SUMMARY PANEL (ADDED ONLY) -->
+<div id="monthPanel">
+  <span class="back" onclick="closeMonthPanel()">← Back</span>
+  <h3 id="monthTitle"></h3>
+  <p id="monthSummary"></p>
+  <canvas id="monthPie" width="260" height="260"></canvas>
+  <canvas id="monthBar" width="300" height="180"></canvas>
+</div>
+
 <script>
 /* COLOR UTILS */
 const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6","#22c55e","#eab308"];
@@ -315,27 +338,24 @@ const save=()=>localStorage.setItem("hh",JSON.stringify(state));
 
 /* SETTINGS */
 function toggleSidebar(){sidebar.classList.toggle("open")}
-
 function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
   modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
   save();
 }
-
 themePicker.oninput=e=>{
   state.accent=e.target.value;
   document.documentElement.style.setProperty("--accent",state.accent);
   save();
 };
-
 nameInput.oninput=e=>{
   state.name=e.target.value;
   title.textContent=state.name||"Hodded Habits";
   save();
 };
 
-/* INIT SETTINGS */
+/* INIT */
 (function(){
   title.textContent=state.name||"Hodded Habits";
   nameInput.value=state.name;
@@ -369,7 +389,9 @@ function showMonths(y,yc){
           const mc=pick([yc]);
           const d=new Date(y,i+1,0).getDate();
           return `
-          <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
+          <div class="card" style="background:${mc}"
+            onclick="showDays(${y},${i},'${yc}','${mc}')"
+            oncontextmenu="openMonthPanel(event,${y},${i})">
             ${m}
             <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
           </div>`;
@@ -440,7 +462,61 @@ function saveDiary(){
   state.diary[currentKey]={title:diaryTitle.value,text:diaryText.value};
   save();panel.classList.remove("open");
 }
+
+/* ✅ MONTH SUMMARY LOGIC (ADDED ONLY) */
+function openMonthPanel(e,year,month){
+  e.preventDefault();
+  monthPanel.classList.add("open");
+
+  let total=0,done=0;
+  const daily={};
+
+  Object.keys(state.tasks).forEach(key=>{
+    const [y,m,d]=key.split("-").map(Number);
+    if(y===year && m===month){
+      state.tasks[key].forEach(t=>{
+        total++; if(t.done) done++;
+      });
+      daily[d]=(daily[d]||0)+state.tasks[key].filter(t=>t.done).length;
+    }
+  });
+
+  const percent=total?Math.round(done/total*100):0;
+  monthTitle.textContent=`${months[month]} ${year}`;
+  monthSummary.textContent=`Completed ${done} of ${total} habits (${percent}%)`;
+
+  drawMonthPie(done,total-done);
+  drawMonthBar(daily);
+}
+
+function closeMonthPanel(){
+  monthPanel.classList.remove("open");
+}
+
+function drawMonthPie(done,pending){
+  const c=monthPie.getContext("2d");
+  c.clearRect(0,0,260,260);
+  const t=done+pending||1;
+  const a=done/t*Math.PI*2;
+  c.fillStyle="#22c55e";
+  c.beginPath();c.moveTo(130,130);c.arc(130,130,120,0,a);c.fill();
+  c.fillStyle="#ef4444";
+  c.beginPath();c.moveTo(130,130);c.arc(130,130,120,a,Math.PI*2);c.fill();
+}
+
+function drawMonthBar(data){
+  const c=monthBar.getContext("2d");
+  c.clearRect(0,0,300,180);
+  const days=Object.keys(data);
+  const max=Math.max(...Object.values(data),1);
+  const w=260/(days.length||1);
+  days.forEach((d,i)=>{
+    const h=data[d]/max*140;
+    c.fillStyle="var(--accent)";
+    c.fillRect(20+i*w,160-h,w-4,h);
+  });
+}
 </script>
 
 </body>
-</html>  
+</html>
