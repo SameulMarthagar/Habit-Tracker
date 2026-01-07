@@ -26,49 +26,7 @@ body{
   color:var(--text);
 }
 
-/* ===== FULLSCREEN PAGES ===== */
-.page{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:var(--bg);
-  z-index:5000;
-}
-.hidden{display:none}
-
-.box{
-  background:var(--card);
-  padding:32px;
-  border-radius:18px;
-  width:90%;
-  max-width:420px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-.box h1{margin-bottom:10px}
-.box p{opacity:.8}
-.box input{
-  width:100%;
-  padding:10px;
-  margin-top:12px;
-  border-radius:10px;
-  border:1px solid #ccc;
-}
-.box button{
-  width:100%;
-  padding:12px;
-  margin-top:16px;
-  border:none;
-  border-radius:12px;
-  background:var(--accent);
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-}
-
-/* ===== HEADER ===== */
+/* HEADER */
 header{
   height:60px;
   background:var(--card);
@@ -80,7 +38,7 @@ header{
 .menu{font-size:22px;cursor:pointer;margin-right:12px}
 header h1{margin-left:auto;font-size:18px}
 
-/* ===== SETTINGS ===== */
+/* SETTINGS */
 #sidebar{
   position:fixed;
   top:0;left:-300px;
@@ -88,137 +46,98 @@ header h1{margin-left:auto;font-size:18px}
   background:var(--card);
   padding:16px;
   transition:.3s;
-  box-shadow:2px 0 14px rgba(0,0,0,.2);
   z-index:3000;
 }
 #sidebar.open{left:0}
 .back{cursor:pointer;color:var(--accent);margin-bottom:14px}
 
 .toggle-wrap{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:14px 0;
+  display:flex;justify-content:space-between;align-items:center;margin:14px 0
 }
 .toggle{
-  width:52px;height:26px;
-  background:#cbd5e1;
-  border-radius:999px;
-  position:relative;
-  cursor:pointer;
+  width:52px;height:26px;background:#cbd5e1;border-radius:999px;position:relative;cursor:pointer
 }
 .toggle::after{
-  content:"";
-  width:20px;height:20px;
-  background:white;
-  border-radius:50%;
-  position:absolute;
-  top:3px;left:3px;
-  transition:.3s;
+  content:"";width:20px;height:20px;background:white;border-radius:50%;
+  position:absolute;top:3px;left:3px;transition:.3s
 }
 body.dark .toggle{background:var(--accent)}
 body.dark .toggle::after{transform:translateX(26px)}
 
-label{font-size:13px;display:block;margin-top:12px}
+label{font-size:13px;margin-top:12px;display:block}
 input{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-top:6px}
 
-/* ===== MAIN ===== */
+/* MAIN */
 main{padding:24px;display:flex;justify-content:center}
 #app{width:100%;max-width:1100px}
 
-/* ===== GRIDS ===== */
+/* GRIDS */
 .grid{display:grid;gap:20px}
 .years{grid-template-columns:repeat(3,1fr)}
 .months{grid-template-columns:repeat(4,1fr)}
 .days{grid-template-columns:repeat(7,1fr)}
 
 .card{
-  border-radius:18px;
-  padding:28px 20px;
-  text-align:center;
+  border-radius:18px;padding:28px 20px;text-align:center;
   box-shadow:0 6px 16px rgba(0,0,0,.12);
-  cursor:pointer;
-  font-size:20px;
-  font-weight:600;
-  color:white;
+  cursor:pointer;font-size:20px;font-weight:600;color:white
 }
 
-/* ===== MINI CALENDAR ===== */
-.mini{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px;
-  margin-top:12px;
-}
-.mini div{
-  background:rgba(255,255,255,.85);
-  font-size:11px;
-  padding:6px 0;
-  border-radius:6px;
-  color:#000;
-}
+/* MINI */
+.mini{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.mini div{background:rgba(255,255,255,.85);font-size:11px;padding:6px 0;border-radius:6px;color:#000}
 
-/* ===== BACK LINKS ===== */
-.back-link{
-  font-size:16px;
-  color:var(--accent);
-  cursor:pointer;
-  margin-bottom:20px;
-}
+/* BACK */
+.back-link{font-size:16px;color:var(--accent);cursor:pointer;margin-bottom:20px}
 
-/* ===== MONTH ===== */
-.month-header{
-  text-align:center;
-  font-size:26px;
-  font-weight:700;
-  margin-bottom:24px;
-}
-.day{
-  border-radius:12px;
-  padding:18px 0;
-  text-align:center;
-  font-size:18px;
-  cursor:pointer;
-  color:#000;
-}
+/* MONTH */
+.month-header{text-align:center;font-size:26px;font-weight:700;margin-bottom:24px}
+.day{border-radius:12px;padding:18px 0;text-align:center;font-size:18px;cursor:pointer;color:#000}
 
-/* ===== DAY PANEL ===== */
+/* DAY PANEL */
 #panel{
-  position:fixed;
-  top:0;right:-420px;
-  width:420px;height:100%;
-  background:var(--card);
-  padding:18px;
-  transition:.3s;
-  z-index:2000;
+  position:fixed;top:0;right:-420px;width:420px;height:100%;
+  background:var(--card);padding:18px;transition:.3s;z-index:2000
 }
 #panel.open{right:0}
 .task{display:flex;gap:8px;margin-bottom:6px}
-.progress{
-  height:10px;background:#e5e7eb;
-  border-radius:999px;overflow:hidden;margin-bottom:12px
-}
+.progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-bottom:12px}
 .progress div{height:100%;background:var(--accent)}
+
+/* WELCOME OVERLAY */
+.page{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;z-index:5000
+}
+.hidden{display:none}
+.box{
+  background:var(--card);padding:32px;border-radius:18px;
+  width:90%;max-width:420px;text-align:center
+}
+.box button{
+  width:100%;padding:12px;margin-top:16px;
+  border:none;border-radius:12px;background:var(--accent);color:white
+}
 </style>
 </head>
 
 <body>
 
-<!-- PAGE 1: WELCOME -->
-<div id="welcomePage" class="page">
+<!-- WELCOME PAGE 1 -->
+<div id="welcome1" class="page">
   <div class="box">
     <h1>Welcome to Hodded Habits</h1>
     <p id="quote"></p>
-    <button onclick="goToName()">Next</button>
+    <button onclick="nextWelcome()">Next</button>
   </div>
 </div>
 
-<!-- PAGE 2: NAME -->
-<div id="namePage" class="page hidden">
+<!-- WELCOME PAGE 2 -->
+<div id="welcome2" class="page hidden">
   <div class="box">
     <h1>Your Name</h1>
     <input id="welcomeName" placeholder="Enter your name">
-    <button onclick="startApp()">Start My Year</button>
+    <button onclick="finishWelcome()">Start My Year</button>
   </div>
 </div>
 
@@ -226,15 +145,12 @@ main{padding:24px;display:flex;justify-content:center}
 <div id="sidebar">
   <div class="back" onclick="toggleSidebar()">← Back</div>
   <h3>Settings</h3>
-
   <label>Name</label>
   <input id="nameInput">
-
   <div class="toggle-wrap">
     <span id="modeText">Dark Mode</span>
     <div class="toggle" onclick="toggleTheme()"></div>
   </div>
-
   <label>Theme Color</label>
   <input type="color" id="colorPicker">
 </div>
@@ -244,72 +160,58 @@ main{padding:24px;display:flex;justify-content:center}
   <h1 id="title">Hodded Habits</h1>
 </header>
 
-<main>
-  <div id="app"></div>
-</main>
+<main><div id="app"></div></main>
 
-<!-- DAY PANEL -->
 <div id="panel">
-  <div class="back-link" onclick="closePanel()">← Back to Month</div>
+  <div class="back-link" onclick="closePanel()">← Back</div>
   <h3 id="panelDate"></h3>
   <div class="progress"><div id="bar"></div></div>
   <input id="taskInput" placeholder="Add task">
-  <button onclick="addTask()" style="width:100%;margin:10px 0">Add</button>
+  <button onclick="addTask()">Add</button>
   <div id="tasks"></div>
   <canvas id="pie"></canvas>
 </div>
 
 <script>
-/* ===== MOTIVATION ===== */
+/* QUOTES */
 const quotes=[
-  "Small habits done daily create massive change.",
-  "Consistency beats motivation every time.",
-  "Your future is built one day at a time.",
-  "Discipline creates freedom.",
-  "Progress over perfection.",
-  "Show up today.",
-  "One habit can change your year."
+  "Small habits create big change.",
+  "Consistency beats motivation.",
+  "One day at a time.",
+  "Discipline builds freedom."
 ];
 quote.textContent=quotes[Math.floor(Math.random()*quotes.length)];
 
-/* ===== STATE ===== */
+/* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{
-  name:"",
-  theme:"light",
-  accent:"#2563eb",
-  data:{},
-  started:false
+  name:"",theme:"light",accent:"#2563eb",data:{},started:false
 };
-function save(){localStorage.setItem("hh",JSON.stringify(state))}
+const save=()=>localStorage.setItem("hh",JSON.stringify(state));
 
-/* ===== WELCOME FLOW ===== */
-function goToName(){
-  welcomePage.classList.add("hidden");
-  namePage.classList.remove("hidden");
+/* WELCOME */
+function nextWelcome(){
+  welcome1.classList.add("hidden");
+  welcome2.classList.remove("hidden");
 }
-function startApp(){
+function finishWelcome(){
   if(!welcomeName.value.trim())return;
   state.name=welcomeName.value.trim();
   state.started=true;
   save();
-  init();
+  welcome1.style.display="none";
+  welcome2.style.display="none";
+  initSettings();
 }
 
-/* ===== INIT ===== */
-function init(){
-  welcomePage.style.display=state.started?"none":"flex";
-  namePage.style.display="none";
+/* SETTINGS INIT */
+function initSettings(){
   title.textContent=state.name||"Hodded Habits";
   nameInput.value=state.name;
   document.documentElement.style.setProperty("--accent",state.accent);
   colorPicker.value=state.accent;
   if(state.theme==="dark")document.body.classList.add("dark");
   updateModeText();
-  showYears();
 }
-if(state.started) init();
-
-/* ===== SETTINGS ===== */
 function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleTheme(){
   document.body.classList.toggle("dark");
@@ -319,89 +221,12 @@ function toggleTheme(){
 function updateModeText(){
   modeText.textContent=document.body.classList.contains("dark")?"Light Mode":"Dark Mode";
 }
-nameInput.oninput=e=>{
-  state.name=e.target.value;
-  title.textContent=state.name;
-  save();
-};
+nameInput.oninput=e=>{state.name=e.target.value;title.textContent=state.name;save()}
 colorPicker.oninput=e=>{
   state.accent=e.target.value;
   document.documentElement.style.setProperty("--accent",e.target.value);
   save();
-};
-
-/* ===== RANDOM COLORS (UI ONLY) ===== */
-const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"][Math.floor(Math.random()*7)];
-const light=()=>["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"][Math.floor(Math.random()*6)];
-
-/* ===== CALENDAR ===== */
-const app=document.getElementById("app");
-const years=[2026,2027,2028,2029,2030,2031,2032,2033,2034];
-const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-let current={year:null,month:null,day:null};
-let chart=null;
-
-function showYears(){
-  app.innerHTML=`<div class="grid years">${years.map(y=>`<div class="card" style="background:${rand()}" onclick="showMonths(${y})">${y}</div>`).join("")}</div>`;
-}
-function showMonths(y){
-  current.year=y;
-  app.innerHTML=`<div class="back-link" onclick="showYears()">← Back to Years</div>
-  <div class="grid months">${months.map((m,i)=>`
-    <div class="card" style="background:${rand()}" onclick="showDays(${i})">
-      ${m}
-      <div class="mini">${Array.from({length:28},(_,d)=>`<div>${d+1}</div>`).join("")}</div>
-    </div>`).join("")}</div>`;
-}
-function showDays(m){
-  current.month=m;
-  const days=new Date(current.year,m+1,0).getDate();
-  app.innerHTML=`<div class="back-link" onclick="showMonths(${current.year})">← Back to Months</div>
-    <div class="month-header">${months[m]} ${current.year}</div>
-    <div class="grid days">${Array.from({length:days},(_,d)=>`
-      <div class="day" style="background:${light()}" onclick="openDay(${d+1})">${d+1}</div>`).join("")}</div>`;
 }
 
-/* ===== DAY PANEL ===== */
-function openDay(d){
-  current.day=d;
-  panel.classList.add("open");
-  const key=`${current.year}-${current.month}-${d}`;
-  panelDate.textContent=`${months[current.month]} ${d}, ${current.year}`;
-  renderTasks(key);
-}
-function closePanel(){panel.classList.remove("open")}
-function addTask(){
-  const key=`${current.year}-${current.month}-${current.day}`;
-  if(!taskInput.value)return;
-  state.data[key]=state.data[key]||[];
-  state.data[key].push({t:taskInput.value,d:false});
-  taskInput.value="";
-  save();renderTasks(key);
-}
-function toggleTask(key,i){
-  state.data[key][i].d=!state.data[key][i].d;
-  save();renderTasks(key);
-}
-function renderTasks(key){
-  const list=state.data[key]||[];
-  let done=0;
-  tasks.innerHTML="";
-  list.forEach((x,i)=>{
-    if(x.d)done++;
-    tasks.innerHTML+=`<div class="task">
-      <input type="checkbox" ${x.d?"checked":""} onchange="toggleTask('${key}',${i})"> ${x.t}
-    </div>`;
-  });
-  bar.style.width=list.length?(done/list.length*100)+"%":"0%";
-  if(chart)chart.destroy();
-  chart=new Chart(pie,{
-    type:"pie",
-    data:{labels:["Done","Left"],datasets:[{data:[done,list.length-done],backgroundColor:[state.accent,"#cbd5e1"]}]},
-    options:{plugins:{legend:{position:"bottom"}}}
-  });
-}
-</script>
-
-</body>
-</html>
+/* RANDOM COLORS */
+const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b]()
