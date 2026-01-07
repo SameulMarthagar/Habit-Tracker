@@ -99,7 +99,7 @@ main{padding:24px;display:flex;justify-content:center}
   color:#000
 }
 
-/* MINI DAYS IN MONTH */
+/* MINI DAYS */
 .mini{
   margin-top:12px;
   display:grid;
@@ -194,19 +194,15 @@ main{padding:24px;display:flex;justify-content:center}
 
 <body>
 
-<!-- SETTINGS -->
 <div id="sidebar">
   <div class="back" onclick="toggleSidebar()">← Back</div>
   <h3>Settings</h3>
-
   <label>Name</label>
   <input id="nameInput">
-
   <div class="toggle-wrap">
     <span id="modeText">Dark Mode</span>
     <div class="toggle" onclick="toggleTheme()"></div>
   </div>
-
   <label>Theme Color</label>
   <input type="color" id="themePicker">
 </div>
@@ -218,13 +214,11 @@ main{padding:24px;display:flex;justify-content:center}
 
 <main><div id="app"></div></main>
 
-<!-- CONTEXT MENU -->
 <div id="contextMenu" onclick="event.stopPropagation()">
   <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
   <div class="context-item" onclick="openDiary()">📔 Diary</div>
 </div>
 
-<!-- REMINDER -->
 <div id="reminderModal">
   <div class="modal">
     <h3>Add Reminder</h3>
@@ -235,7 +229,6 @@ main{padding:24px;display:flex;justify-content:center}
   </div>
 </div>
 
-<!-- DIARY -->
 <div id="panel">
   <span class="back" onclick="closeDiary()">← Back</span>
   <h3>Diary Entry</h3>
@@ -244,7 +237,6 @@ main{padding:24px;display:flex;justify-content:center}
   <button class="btn primary" onclick="saveDiary()">Save</button>
 </div>
 
-<!-- TASK PANEL -->
 <div id="taskPanel">
   <span class="back" onclick="closeTasks()">← Back</span>
   <h3>Daily Tasks</h3>
@@ -253,9 +245,14 @@ main{padding:24px;display:flex;justify-content:center}
 </div>
 
 <script>
-/* RANDOM COLORS */
-const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"][Math.floor(Math.random()*7)];
-const light=()=>["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"][Math.floor(Math.random()*6)];
+/* COLOR UTILS */
+const colors=["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6","#22c55e","#eab308"];
+const pick=(exclude=[])=>{
+  let c;
+  do{c=colors[Math.floor(Math.random()*colors.length)]}
+  while(exclude.includes(c));
+  return c;
+};
 
 /* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{
@@ -268,7 +265,6 @@ let state=JSON.parse(localStorage.getItem("hh"))||{
 };
 const save=()=>localStorage.setItem("hh",JSON.stringify(state));
 
-/* SETTINGS */
 function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleTheme(){
   document.body.classList.toggle("dark");
@@ -287,7 +283,6 @@ nameInput.oninput=e=>{
   save();
 };
 
-/* INIT SETTINGS */
 (function(){
   title.textContent=state.name||"Hodded Habits";
   nameInput.value=state.name;
@@ -299,38 +294,51 @@ nameInput.oninput=e=>{
 
 /* CALENDAR */
 const app=document.getElementById("app");
-const years=[2026,2027,2028,2029,2030,2031,2032,2033];
+
+/* 3 × 3 × 3 YEARS = 27 */
+const years=Array.from({length:27},(_,i)=>2026+i);
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
 let currentKey=null;
 
 function showYears(){
-  app.innerHTML=`<div class="grid years">${years.map(y=>`
-    <div class="card" style="background:${rand()}" onclick="showMonths(${y})">${y}</div>
-  `).join("")}</div>`;
+  app.innerHTML=`<div class="grid years">${
+    years.map(y=>{
+      const yc=pick();
+      return `<div class="card" style="background:${yc}" onclick="showMonths(${y},'${yc}')">${y}</div>`;
+    }).join("")
+  }</div>`;
 }
-function showMonths(y){
+
+function showMonths(y,yc){
   app.innerHTML=`<span class="back" onclick="showYears()">← Back</span>
-  <div class="grid months">${months.map((m,i)=>{
-    const d=new Date(y,i+1,0).getDate();
-    return `
-    <div class="card" style="background:${rand()}" onclick="showDays(${y},${i})">
-      ${m}
-      <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
-    </div>`;
-  }).join("")}</div>`;
+  <div class="grid months">${
+    months.map((m,i)=>{
+      const mc=pick([yc]);
+      const d=new Date(y,i+1,0).getDate();
+      return `
+      <div class="card" style="background:${mc}" onclick="showDays(${y},${i},'${yc}','${mc}')">
+        ${m}
+        <div class="mini">${Array.from({length:d},(_,n)=>`<div>${n+1}</div>`).join("")}</div>
+      </div>`;
+    }).join("")
+  }</div>`;
 }
-function showDays(y,m){
+
+function showDays(y,m,yc,mc){
   const days=new Date(y,m+1,0).getDate();
-  app.innerHTML=`<span class="back" onclick="showMonths(${y})">← Back</span>
-  <div class="grid days">${Array.from({length:days},(_,d)=>`
-    <div class="day" style="background:${light()}"
-      onclick="openTasks('${y}-${m}-${d+1}')"
-      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>
-  `).join("")}</div>`;
+  app.innerHTML=`<span class="back" onclick="showMonths(${y},'${yc}')">← Back</span>
+  <div class="grid days">${
+    Array.from({length:days},(_,d)=>{
+      const dc=pick([yc,mc]);
+      return `<div class="day" style="background:${dc}"
+        onclick="openTasks('${y}-${m}-${d+1}')"
+        oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`;
+    }).join("")
+  }</div>`;
 }
 showYears();
 
-/* RIGHT CLICK */
+/* CONTEXT */
 function openMenu(e,key){
   e.preventDefault();e.stopPropagation();
   currentKey=key;
