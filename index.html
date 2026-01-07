@@ -128,12 +128,18 @@ main{padding:24px;display:flex;justify-content:center}
 }
 .modal-actions{display:flex;gap:10px;margin-top:18px}
 
-/* DIARY PANEL */
+/* DIARY PANEL (SLIDE FROM LEFT) */
 #panel{
-  position:fixed;top:0;right:-440px;width:440px;height:100%;
-  padding:18px;transition:.3s;z-index:3000
+  position:fixed;
+  top:0;
+  left:-440px;
+  width:440px;
+  height:100%;
+  padding:18px;
+  transition:.3s;
+  z-index:3000;
 }
-#panel.open{right:0}
+#panel.open{left:0}
 
 .btn{
   padding:12px;border:none;border-radius:14px;
@@ -205,7 +211,7 @@ main{padding:24px;display:flex;justify-content:center}
 <main><div id="app"></div></main>
 
 <!-- CONTEXT MENU -->
-<div id="contextMenu" onclick="event.stopPropagation()">
+<div id="contextMenu">
   <div class="context-item" onclick="openReminder()">🔔 Reminder</div>
   <div class="context-item" onclick="openDiary()">📔 Diary</div>
 </div>
@@ -215,7 +221,7 @@ main{padding:24px;display:flex;justify-content:center}
   <div class="modal">
     <h3>Add Reminder 🔔</h3>
     <input id="reminderTitle" placeholder="Reminder title">
-    <textarea id="reminderNote" placeholder="Notes (optional)"></textarea>
+    <textarea id="reminderNote" placeholder="Message"></textarea>
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeReminder()">Back</button>
       <button class="btn primary" onclick="saveReminder()">Save</button>
@@ -234,6 +240,7 @@ main{padding:24px;display:flex;justify-content:center}
 
 <script>
 /* QUOTES */
+const quote = document.getElementById("quote");
 const quotes=[
   "Small habits create big change.",
   "Consistency beats motivation.",
@@ -295,7 +302,7 @@ function initSettings(){
   modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
 }
 
-/* RANDOM COLORS */
+/* COLORS */
 const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"][Math.floor(Math.random()*7)];
 const light=()=>["#fde68a","#bbf7d0","#bfdbfe","#ddd6fe","#fbcfe8","#99f6e4"][Math.floor(Math.random()*6)];
 
@@ -323,26 +330,24 @@ function showDays(y,m){
   app.innerHTML=`<span class="back-link" onclick="showMonths(${y})">← Back</span>
   <div class="grid days">${Array.from({length:days},(_,d)=>`
     <div class="day" style="background:${light()}"
-      oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`).join("")}</div>`;
+      onclick="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`).join("")}</div>`;
 }
 
-/* CONTEXT MENU FIX */
+/* CONTEXT MENU */
 function openMenu(e,key){
-  e.preventDefault();
   e.stopPropagation();
   currentKey=key;
   contextMenu.style.display="block";
   contextMenu.style.left=e.pageX+"px";
   contextMenu.style.top=e.pageY+"px";
 }
-document.addEventListener("click",(e)=>{
-  if(!contextMenu.contains(e.target)){
-    contextMenu.style.display="none";
-  }
+document.addEventListener("click",()=>{
+  contextMenu.style.display="none";
 });
 
 /* REMINDER */
 function openReminder(){
+  contextMenu.style.display="none";
   const r=state.reminders[currentKey]||{};
   reminderTitle.value=r.title||"";
   reminderNote.value=r.note||"";
@@ -352,7 +357,6 @@ function closeReminder(){
   reminderModal.style.display="none";
 }
 function saveReminder(){
-  if(!currentKey) return;
   state.reminders[currentKey]={
     title:reminderTitle.value,
     note:reminderNote.value
@@ -363,6 +367,7 @@ function saveReminder(){
 
 /* DIARY */
 function openDiary(){
+  contextMenu.style.display="none";
   const d=state.diary[currentKey]||{};
   diaryTitle.value=d.title||"";
   diaryText.value=d.text||"";
@@ -373,7 +378,6 @@ function closeDiary(){
   panel.classList.remove("open");
 }
 function saveDiary(){
-  if(!currentKey) return;
   state.diary[currentKey]={
     title:diaryTitle.value,
     text:diaryText.value
