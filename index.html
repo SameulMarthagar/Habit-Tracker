@@ -40,7 +40,8 @@ header h1{margin-left:auto;font-size:18px}
 
 /* SETTINGS */
 #sidebar{
-  position:fixed;top:0;left:-300px;
+  position:fixed;
+  top:0;left:-300px;
   width:300px;height:100%;
   background:var(--card);
   padding:16px;
@@ -134,6 +135,7 @@ main{padding:24px;display:flex;justify-content:center}
   padding:16px;transition:.3s;z-index:3000
 }
 #panel.open{right:0}
+
 .btn{
   padding:12px;border:none;border-radius:12px;
   cursor:pointer;font-size:15px
@@ -183,12 +185,17 @@ main{padding:24px;display:flex;justify-content:center}
 <div id="sidebar">
   <div class="back" onclick="toggleSidebar()">← Back</div>
   <h3>Settings</h3>
+
   <label>Name</label>
   <input id="nameInput">
+
   <div class="toggle-wrap">
     <span id="modeText">Dark Mode</span>
     <div class="toggle" onclick="toggleTheme()"></div>
   </div>
+
+  <label>Theme Color</label>
+  <input type="color" id="themePicker">
 </div>
 
 <header>
@@ -236,10 +243,14 @@ quote.textContent=quotes[Math.floor(Math.random()*quotes.length)];
 
 /* STATE */
 let state=JSON.parse(localStorage.getItem("hh"))||{
-  started:false,name:"",theme:"light",
-  diary:{},reminders:{}
+  started:false,
+  name:"",
+  theme:"light",
+  accent:"#2563eb",
+  diary:{},
+  reminders:{}
 };
-const save=()=>localStorage.setItem("hh",JSON.stringify(state));
+const saveState=()=>localStorage.setItem("hh",JSON.stringify(state));
 
 /* ONBOARD */
 function toName(){
@@ -249,10 +260,11 @@ function toName(){
 function finishWelcome(){
   if(!welcomeName.value.trim())return;
   state.name=welcomeName.value.trim();
-  state.started=true;save();
+  state.started=true;
+  saveState();
   welcome1.style.display="none";
   welcome2.style.display="none";
-  title.textContent=state.name;
+  initSettings();
 }
 
 /* SETTINGS */
@@ -261,9 +273,26 @@ function toggleTheme(){
   document.body.classList.toggle("dark");
   state.theme=document.body.classList.contains("dark")?"dark":"light";
   modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
-  save();
+  saveState();
 }
-nameInput.oninput=e=>{state.name=e.target.value;title.textContent=state.name;save()}
+themePicker.oninput=e=>{
+  state.accent=e.target.value;
+  document.documentElement.style.setProperty("--accent",e.target.value);
+  saveState();
+};
+nameInput.oninput=e=>{
+  state.name=e.target.value;
+  title.textContent=state.name;
+  saveState();
+};
+
+function initSettings(){
+  title.textContent=state.name||"Hodded Habits";
+  document.documentElement.style.setProperty("--accent",state.accent);
+  themePicker.value=state.accent;
+  if(state.theme==="dark") document.body.classList.add("dark");
+  modeText.textContent=state.theme==="dark"?"Light Mode":"Dark Mode";
+}
 
 /* RANDOM COLORS */
 const rand=()=>["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899","#14b8a6"][Math.floor(Math.random()*7)];
@@ -296,9 +325,10 @@ function showDays(y,m){
       oncontextmenu="openMenu(event,'${y}-${m}-${d+1}')">${d+1}</div>`).join("")}</div>`;
 }
 
-/* CONTEXT */
+/* CONTEXT MENU */
 function openMenu(e,key){
-  e.preventDefault();currentKey=key;
+  e.preventDefault();
+  currentKey=key;
   contextMenu.style.display="block";
   contextMenu.style.left=e.pageX+"px";
   contextMenu.style.top=e.pageY+"px";
@@ -310,10 +340,14 @@ function openReminder(){
   reminderText.value=state.reminders[currentKey]||"";
   reminderModal.style.display="flex";
 }
-function closeReminder(){reminderModal.style.display="none"}
+function closeReminder(){
+  reminderModal.style.display="none";
+}
 function saveReminder(){
+  if(!currentKey) return;
   state.reminders[currentKey]=reminderText.value;
-  save();reminderModal.style.display="none";
+  saveState();
+  reminderModal.style.display="none";
 }
 
 /* DIARY */
@@ -322,10 +356,14 @@ function openDiary(){
   panel.style.background=`linear-gradient(135deg,${rand()},${rand()})`;
   panel.classList.add("open");
 }
-function closeDiary(){panel.classList.remove("open")}
+function closeDiary(){
+  panel.classList.remove("open");
+}
 function saveDiary(){
+  if(!currentKey) return;
   state.diary[currentKey]=diaryText.value;
-  save();panel.classList.remove("open");
+  saveState();
+  panel.classList.remove("open");
 }
 
 /* INIT */
@@ -333,7 +371,7 @@ showYears();
 if(state.started){
   welcome1.style.display="none";
   welcome2.style.display="none";
-  title.textContent=state.name;
+  initSettings();
 }
 </script>
 
